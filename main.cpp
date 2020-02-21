@@ -73,12 +73,17 @@ void printUsage()
 
 int main(int argc, char **argv)
 {
+#ifdef DEBUG
+    std::cout << "Please compile and run approx in release mode!" << std::endl;
+    return -99;
+#endif
     // check arguments
     if (argc < 3 || !readArguments(argc, argv))
     {
         printUsage();
         return -1;
     }
+    // check which tests to run
     if (m_approxFunc == "sqrtf")
     {
         SqrtfTest sqrtTest(std::make_pair(0, 2), 1000000);

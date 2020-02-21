@@ -121,10 +121,10 @@ float sqrtf5(const float x)
 }
 
 // Fast inverse square root aka "Quake 3 fast inverse square root", multiplied by x, which is sqrt(x).
-// Uses two Newton iterations for better precision.
+// Uses one iteration of Halley's method for precision.
+// See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Iterative_methods_for_reciprocal_square_roots
 float sqrtf6(const float x)
 {
-    const float xhalf = 0.5 * x;
     union // get bits for floating value
     {
         float x;
@@ -132,9 +132,10 @@ float sqrtf6(const float x)
     } u;
     u.x = x;
     u.i = 0x5F375A86 - (u.i >> 1); // gives initial guess y0. use 0x5fe6ec85e7de30da for double
-    u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
-    u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
-    return x * u.x;
+    float xu = x * u.x;
+    float xu2 = xu * u.x;
+    u.x = (0.125 * 3.0) * xu * (5.0 - xu2 * ((10.0 / 3.0) - xu2)); // Halley's method, repeating increases accuracy
+    return u.x;
 }
 
 // Bit twiddling from Intel Software Optimization Cookbook, 2nd edition, page 187
@@ -252,7 +253,7 @@ public:
         results.push_back(run( "sqrt3", "log2(x) + bias + Babylonian", &sqrtf3, &sqrtf_reference));
         results.push_back(run( "sqrt4", "log2(x) + bias + Bakhshali", &sqrtf4, &sqrtf_reference));
         results.push_back(run( "sqrt5", "Quake3 + Newton", &sqrtf5, &sqrtf_reference));
-        results.push_back(run( "sqrt6", "Quake3 + 2 * Newton", &sqrtf6, &sqrtf_reference));
+        results.push_back(run( "sqrt6", "Quake3 + Halley", &sqrtf6, &sqrtf_reference));
         results.push_back(run( "sqrt7", "Intel SOC", &sqrtf7, &sqrtf_reference));
         results.push_back(run( "sqrt8", "Intel SOC + Bakhshali", &sqrtf8, &sqrtf_reference));
         results.push_back(run( "sqrt9", "Taylor3", &sqrtf9, &sqrtf_reference));
