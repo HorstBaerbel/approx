@@ -1,6 +1,6 @@
 # C++ testbed for (transcendental) function approximations
 
-Tests some transcendental function approximations, e.g. for sqrt() for speed and precision. Note that **these are approximations only with varying degrees of precision and speed.** I consciously left out tricks like using assembler code or SSE / NEON. These should be obvious and can be used in conjuctions with some of the the methods here. Also a good compiler makes those optimizations for you anyway. Note that you should **compile with optimizations on**, otherwise your results will be off!
+Tests some transcendental function approximations, e.g. for sqrt() for speed and precision. Note that **these are approximations only with varying degrees of precision and speed.** I consciously left out tricks like using assembler code or SSE / NEON. These should be obvious and can be used in conjuction with some of the the methods here. Also a good compiler makes those optimizations for you anyway. Note that you should **compile with optimizations on** (```-O2 -ffast-math```), otherwise your results will be off!
 
 ## License
 
