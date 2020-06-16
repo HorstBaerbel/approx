@@ -5,15 +5,16 @@
 #include <string>
 #include <cstdio>
 #if defined(__GNUC__) || defined(__clang__)
-    #include <experimental/filesystem>
-    namespace FS_NAMESPACE = std::experimental::filesystem;
+#include <experimental/filesystem>
+namespace FS_NAMESPACE = std::experimental::filesystem;
 #elif defined(_MSC_VER)
-    #include <filesystem>
-    namespace FS_NAMESPACE = std::tr2::sys;
+#include <filesystem>
+namespace FS_NAMESPACE = std::tr2::sys;
 #endif
 
 #include "cxxopts/include/cxxopts.hpp"
 #include "test_sqrtf.h"
+#include "test_log10f.h"
 
 std::string m_outFile;
 std::string m_approxFunc = "sqrtf";
@@ -22,17 +23,13 @@ bool readArguments(int argc, char **&argv)
 {
     cxxopts::Options options("approx", "Test transcendental function approximations");
     options.allow_unrecognised_options();
-    options.add_options()
-        ("h,help", "Print help")
-        ("f,function", "Name of function to test. Currently only sqrtf is supported", cxxopts::value<std::string>())
-        ("o,outfile", "Result CSV file name. Will be overwritten.", cxxopts::value<std::string>())
-        ("positional", "", cxxopts::value<std::vector<std::string>>());
+    options.add_options()("h,help", "Print help")("f,function", "Name of function to test. Currently only sqrtf and log10f supported", cxxopts::value<std::string>())("o,outfile", "Result CSV file name. Will be overwritten.", cxxopts::value<std::string>())("positional", "", cxxopts::value<std::vector<std::string>>());
     options.parse_positional({"outfile", "positional"});
     auto result = options.parse(argc, argv);
     // check if help was requested
     if (result.count("help"))
     {
-      return false;
+        return false;
     }
     // check if a function was specified
     if (result.count("function"))
@@ -54,7 +51,7 @@ bool readArguments(int argc, char **&argv)
         std::cout << "No output file passed!" << std::endl;
         return false;
     }
- 
+
     return true;
 }
 
@@ -65,8 +62,8 @@ void printUsage()
     std::cout << "Usage: approx (-h, -f FUNC) OUTFILE" << std::endl;
     std::cout << "OUTFILE: Result HTML file name. File will be overwritten." << std::endl;
     std::cout << "-h: Print usage help." << std::endl;
-    std::cout << "-f FUNC: Function to test. Currently only \"sqrtf\" is supported." << std::endl;
-    std::cout << "Example: approx -f sqrt bla.html" << std::endl;
+    std::cout << "-f FUNC: Function to test. Currently only \"sqrtf\" and \"log10f\" are supported." << std::endl;
+    std::cout << "Example: approx -f sqrtf bla.html" << std::endl;
 }
 
 // ----- main -------------------------------------------------------------------------------------
@@ -86,8 +83,14 @@ int main(int argc, char **argv)
     // check which tests to run
     if (m_approxFunc == "sqrtf")
     {
-        SqrtfTest sqrtTest(std::make_pair(0, 2), 1000000);
+        SqrtfTest sqrtTest(std::make_pair(0, 65535), 1000000);
         auto results = sqrtTest.runTests();
+        std::cout << results;
+    }
+    else if (m_approxFunc == "log10f")
+    {
+        Log10Test log10Test(std::make_pair(0, 65535), 1000000);
+        auto results = log10Test.runTests();
         std::cout << results;
     }
     else

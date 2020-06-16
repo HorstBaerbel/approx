@@ -18,7 +18,7 @@
 #include <vector>
 
 // Calculate the reference value for comparison.
-// Note that we could square the approximate result to get the input number 
+// Note that we could square the approximate result to get the input number
 // and use that for precision calculation, but then RMS etc would have a
 // different meaning. Here we count on the std implementation to be very precise.
 long double sqrtf_reference(const long double x)
@@ -27,16 +27,17 @@ long double sqrtf_reference(const long double x)
 }
 
 // Standard sqrt function for comaprison.
-float sqrtf0(const float x)
+float sqrtf_0(const float x)
 {
     return sqrtf(x);
 }
 
 // Get approximation for log2(x) / 2 and add bias to improve error.
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
-float sqrtf1(const float x)
+float sqrtf_1(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -45,12 +46,13 @@ float sqrtf1(const float x)
     return u.x;
 }
 
-// Get approximation for log2(x) / 2 as initial guess, 
+// Get approximation for log2(x) / 2 as initial guess,
 // apply Babylonian method twice.
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
-float sqrtf2(const float x)
+float sqrtf_2(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -64,13 +66,14 @@ float sqrtf2(const float x)
     return u.x;
 }
 
-// Get approximation for log2(x) / 2 as initial guess, 
+// Get approximation for log2(x) / 2 as initial guess,
 // add bias to improve error,
 // apply Babylonian method twice.
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
-float sqrtf3(const float x)
+float sqrtf_3(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -84,13 +87,14 @@ float sqrtf3(const float x)
     return u.x;
 }
 
-// Get approximation for log2(x) / 2 as initial guess, 
-// add bias to improve error, 
+// Get approximation for log2(x) / 2 as initial guess,
+// add bias to improve error,
 // apply an iteration of the Bakhshali method for better precision.
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
-float sqrtf4(const float x)
+float sqrtf_4(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -105,7 +109,7 @@ float sqrtf4(const float x)
 // See: https://en.wikipedia.org/wiki/Fast_inverse_square_root
 // See: http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf
 // Similar in: // See: http://www.azillionmonkeys.com/qed/sqroot.html#calcmeth
-float sqrtf5(const float x)
+float sqrtf_5(const float x)
 {
     const float xhalf = 0.5 * x;
     union // get bits for floating value
@@ -114,7 +118,7 @@ float sqrtf5(const float x)
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1); // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.i = 0x5F375A86 - (u.i >> 1);         // gives initial guess y0. use 0x5fe6ec85e7de30da for double
     u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     //u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return x * u.x;
@@ -123,7 +127,7 @@ float sqrtf5(const float x)
 // Fast inverse square root aka "Quake 3 fast inverse square root", multiplied by x, which is sqrt(x).
 // Uses one iteration of Halley's method for precision.
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Iterative_methods_for_reciprocal_square_roots
-float sqrtf6(const float x)
+float sqrtf_6(const float x)
 {
     union // get bits for floating value
     {
@@ -140,11 +144,11 @@ float sqrtf6(const float x)
 
 // Bit twiddling from Intel Software Optimization Cookbook, 2nd edition, page 187
 // See: http://bits.stephan-brumme.com/squareRoot.html
-float sqrtf7(const float x)
+float sqrtf_7(const float x)
 {
     unsigned int i = *(unsigned int *)&x;
     i += 127 << 23; // adjust bias
-    i >>= 1; // approximation of square root
+    i >>= 1;        // approximation of square root
     return *(float *)&i;
 }
 
@@ -152,32 +156,34 @@ float sqrtf7(const float x)
 // with an iteration of the Bakhshali method for better precision.
 // See: http://bits.stephan-brumme.com/squareRoot.html
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Bakhshali_method
-float sqrtf8(const float x)
+float sqrtf_8(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
     u.x = x;
     u.i += 127 << 23; // adjust bias
-    u.i >>= 1; // approximation of square root
+    u.i >>= 1;        // approximation of square root
     u.x = (u.x * u.x + x) / (2 * u.x);
     return u.x;
 }
 
 // Taylor series with some bit fiddling?
 // See: https://dsp.stackexchange.com/questions/17269/what-approximation-techniques-exist-for-computing-the-square-root
-float sqrtf9(const float x)
+float sqrtf_9(const float x)
 {
-    union {
+    union
+    {
         float f;
         long i;
     } u;
     u.f = x;
-    uint32_t intPart = ((u.i) >> 23); // get biased exponent
-    intPart -= 127; // unbias it
+    uint32_t intPart = ((u.i) >> 23);    // get biased exponent
+    intPart -= 127;                      // unbias it
     float n = (float)(u.i & 0x007FFFFF); // mask off exponent leaving 0x800000*(mantissa - 1)
-    n *= 1.192092895507812e-07; // divide by 0x800000
+    n *= 1.192092895507812e-07;          // divide by 0x800000
     float accumulator = 1.0 + 0.49959804148061 * n;
     float xPower = n * n;
     accumulator += -0.12047308243453 * xPower;
@@ -190,14 +196,14 @@ float sqrtf9(const float x)
         accumulator *= 1.41421356237309504880; // an odd input exponent means an extra sqrt(2) in the output
     }
     u.i = intPart >> 1; // divide exponent by 2, lose LSB
-    u.i += 127; // rebias exponent
-    u.i <<= 23; // move biased exponent into exponent bits
+    u.i += 127;         // rebias exponent
+    u.i <<= 23;         // move biased exponent into exponent bits
     return accumulator * u.f;
 }
 
 // Apply Newtons method until answer does not change.
 // See: http://forums.techarena.in/software-development/1290144.htm (Author: "Reegan")
-float sqrtf10(const float x)
+float sqrtf_10(const float x)
 {
     float n = x / 2.0;
     float lstX = 0.0;
@@ -211,7 +217,7 @@ float sqrtf10(const float x)
 
 // Apply Newtons method until ACCURACY is reached.
 // See: http://www.cs.uni.edu/~jacobson/C++/newton.html
-float sqrtf11(const float x)
+float sqrtf_11(const float x)
 {
     const float ACCURACY = 0.001;
     float lower, upper, guess;
@@ -247,18 +253,18 @@ public:
     std::vector<Result<float>> runTests() const
     {
         std::vector<Result<float>> results;
-        results.push_back(run( "sqrt0", "Standard library sqrtf", &sqrtf0, &sqrtf_reference));
-        results.push_back(run( "sqrt1", "log2(x) + bias", &sqrtf1, &sqrtf_reference));
-        results.push_back(run( "sqrt2", "log2(x) + Babylonian", &sqrtf2, &sqrtf_reference));
-        results.push_back(run( "sqrt3", "log2(x) + bias + Babylonian", &sqrtf3, &sqrtf_reference));
-        results.push_back(run( "sqrt4", "log2(x) + bias + Bakhshali", &sqrtf4, &sqrtf_reference));
-        results.push_back(run( "sqrt5", "Quake3 + Newton", &sqrtf5, &sqrtf_reference));
-        results.push_back(run( "sqrt6", "Quake3 + Halley", &sqrtf6, &sqrtf_reference));
-        results.push_back(run( "sqrt7", "Intel SOC", &sqrtf7, &sqrtf_reference));
-        results.push_back(run( "sqrt8", "Intel SOC + Bakhshali", &sqrtf8, &sqrtf_reference));
-        results.push_back(run( "sqrt9", "Taylor3", &sqrtf9, &sqrtf_reference));
-        results.push_back(run("sqrt10", "Newton while change", &sqrtf10, &sqrtf_reference));
-        results.push_back(run("sqrt11", "Newton accuracy 0.001", &sqrtf11, &sqrtf_reference));
+        results.push_back(run("sqrtf #0", "Standard library sqrtf", &sqrtf_0, &sqrtf_reference));
+        results.push_back(run("sqrtf #1", "log2(x) + bias", &sqrtf_1, &sqrtf_reference));
+        results.push_back(run("sqrtf #2", "log2(x) + Babylonian", &sqrtf_2, &sqrtf_reference));
+        results.push_back(run("sqrtf #3", "log2(x) + bias + Babylonian", &sqrtf_3, &sqrtf_reference));
+        results.push_back(run("sqrtf #4", "log2(x) + bias + Bakhshali", &sqrtf_4, &sqrtf_reference));
+        results.push_back(run("sqrtf #5", "Quake3 + Newton", &sqrtf_5, &sqrtf_reference));
+        results.push_back(run("sqrtf #6", "Quake3 + Halley", &sqrtf_6, &sqrtf_reference));
+        results.push_back(run("sqrtf #7", "Intel SOC", &sqrtf_7, &sqrtf_reference));
+        results.push_back(run("sqrtf #8", "Intel SOC + Bakhshali", &sqrtf_8, &sqrtf_reference));
+        results.push_back(run("sqrtf #9", "Taylor3", &sqrtf_9, &sqrtf_reference));
+        results.push_back(run("sqrtf #10", "Newton while change", &sqrtf_10, &sqrtf_reference));
+        results.push_back(run("sqrtf #11", "Newton accuracy 0.001", &sqrtf_11, &sqrtf_reference));
         return results;
     }
 

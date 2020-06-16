@@ -9,7 +9,11 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
-            "args": ["-f", "sqrtf", "sqrtf.html"],
+            "args": [
+                "-f",
+                "log10f",
+                "log10f.html"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
