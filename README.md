@@ -39,8 +39,9 @@ make -j$(nproc)
 
 Run ```approx``` with the following options:
 
-* ```sqrtf```: Test approximations for the float square root function.
 * ```log10f```: Test approximations for the float log10 function.
+* ```invsqrtf```: Test approximations for the float 1 / square root function.
+* ```sqrtf```: Test approximations for the float square root function.
 * All other approximations are WIP...
 
 The result is a listing of every function tested, its min/max absolute and relative errors, the standard deviation and the execution time per call, e.g.

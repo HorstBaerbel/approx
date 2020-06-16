@@ -32,6 +32,7 @@ float log10f_1(const float x)
 }
 
 // Get approximation for log2(x).
+// Dr. Paul Beckmann
 // See: http://openaudio.blogspot.com/2017/02/faster-log10-and-pow.html
 // And: https://community.arm.com/developer/tools-software/tools/f/armds-forum/4292/cmsis-dsp-new-functionality-proposal/22621#22621
 float log10f_2(const float x)
@@ -51,6 +52,7 @@ float log10f_2(const float x)
 }
 
 // compute log2(x) by reducing x to [0.75, 1.5), then divide by log2(10)
+// David Goldberg
 // See: https://tech.ebayinc.com/engineering/fast-approximate-logarithms-part-iii-the-formulas/
 // This version uses divides
 float log10f_3(float x)
@@ -104,6 +106,7 @@ float log10f_3(float x)
 }
 
 // compute log2(x) by reducing x to [0.75, 1.5), then divide by log2(10)
+// David Goldberg
 // See: https://tech.ebayinc.com/engineering/fast-approximate-logarithms-part-iii-the-formulas/
 // This version uses only multiplies
 float log10f_4(float x)

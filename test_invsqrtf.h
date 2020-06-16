@@ -1,36 +1,38 @@
 #pragma once
 
-// WIP
-
 // The functions in this file are collected from all over the internet.
 // and Wikipedia:
 // https://en.wikipedia.org/wiki/Methods_of_computing_square_roots
 
 // All functions here assume positive, non-zero input values.
+// All functions operate on float values, but some can be used on double values too.
 
-float invsqrt0(const float x)
+#include "test.h"
+#include <cstdint>
+#include <math.h>
+#include <vector>
+
+// Calculate the reference value for comparison.
+// Note that we could square the approximate result to get the input number
+// and use that for precision calculation, but then RMS etc would have a
+// different meaning. Here we count on the std implementation to be very precise.
+long double invsqrtf_reference(const long double x)
 {
-    return 1.0 / sqrt(x);
+    return 1.0 / sqrtl(x);
 }
 
-// Reduced version of the Fast inverse square root aka "Quake 3 fast inverse square root", 
-// This uses the magic number 0x5F375A86 instead of the orginal 0x5F3759DF.
-// See: https://bits.stephan-brumme.com/invSquareRoot.html
-float invsqrt1(const float x)
+// Standard sqrtf function for comparison.
+float invsqrtf_0(const float x)
 {
-    // access float with integer logic
-    unsigned int *i = (unsigned int *)&x;
-    // approximation with empirically found "magic number"
-    *i = 0x5F375A86 - (*i >> 1);
-    return x;
+    return 1.0 / sqrtf(x);
 }
 
-// Fast inverse square root aka "Quake 3 fast inverse square root", multiplied by x, which is sqrt(x).
+// Fast inverse square root aka "Quake 3 fast inverse square root".
 // This uses the magic number 0x5F375A86 instead of the orginal 0x5F3759DF.
 // See: https://en.wikipedia.org/wiki/Fast_inverse_square_root
 // See: http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf
 // Similar in: // See: http://www.azillionmonkeys.com/qed/sqroot.html#calcmeth
-float invsqrt2(const float x)
+float invsqrtf_1(const float x)
 {
     const float xhalf = 0.5 * x;
     union // get bits for floating value
@@ -39,15 +41,18 @@ float invsqrt2(const float x)
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1); // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.i = 0x5F375A86 - (u.i >> 1);         // gives initial guess y0. use 0x5fe6ec85e7de30da for double
     u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
-    //u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return u.x;
 }
 
 // Fast inverse square root aka "Quake 3 fast inverse square root".
+// This uses the magic number 0x5F375A86 instead of the orginal 0x5F3759DF.
 // Uses two Newton iterations for better precision.
-float invsqrt3(const float x)
+// See: https://en.wikipedia.org/wiki/Fast_inverse_square_root
+// See: http://www.lomont.org/Math/Papers/2003/InvSqrt.pdf
+// Similar in: // See: http://www.azillionmonkeys.com/qed/sqroot.html#calcmeth
+float invsqrtf_2(const float x)
 {
     const float xhalf = 0.5 * x;
     union // get bits for floating value
@@ -56,8 +61,37 @@ float invsqrt3(const float x)
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1); // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.i = 0x5F375A86 - (u.i >> 1);         // gives initial guess y0. use 0x5fe6ec85e7de30da for double
     u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return u.x;
 }
+
+class InvSqrtfTest : public Test<float>
+{
+public:
+    InvSqrtfTest(const std::pair<float, float> &inputRange, uint64_t samplesInRange)
+        : Test(fixupInputRange(inputRange), samplesInRange)
+    {
+    }
+
+    std::vector<Result<float>> runTests() const
+    {
+        std::vector<Result<float>> results;
+        results.push_back(run("invsqrtf #0", "Standard library 1 / sqrtf", &invsqrtf_0, &invsqrtf_reference));
+        results.push_back(run("invsqrtf #1", "Quake3", &invsqrtf_1, &invsqrtf_reference));
+        results.push_back(run("invsqrtf #2", "Quake3 + Newton", &invsqrtf_2, &invsqrtf_reference));
+        return results;
+    }
+
+protected:
+    static std::pair<float, float> fixupInputRange(const std::pair<float, float> &range)
+    {
+        std::pair<float, float> result;
+        result.first = range.first <= 0 ? std::numeric_limits<float>::min() : range.first;
+        result.second = range.second <= 0 ? std::numeric_limits<float>::min() : range.second;
+        result.first = result.first > std::numeric_limits<float>::max() ? std::numeric_limits<float>::max() : result.first;
+        result.second = result.second > std::numeric_limits<float>::max() ? std::numeric_limits<float>::max() : result.second;
+        return result;
+    }
+};

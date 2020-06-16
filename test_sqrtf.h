@@ -26,7 +26,7 @@ long double sqrtf_reference(const long double x)
     return sqrtl(x);
 }
 
-// Standard sqrt function for comaprison.
+// Standard sqrtf function for comparison.
 float sqrtf_0(const float x)
 {
     return sqrtf(x);
@@ -36,8 +36,7 @@ float sqrtf_0(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_1(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -51,8 +50,7 @@ float sqrtf_1(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_2(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -72,8 +70,7 @@ float sqrtf_2(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_3(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -93,8 +90,7 @@ float sqrtf_3(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_4(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -158,8 +154,7 @@ float sqrtf_7(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Bakhshali_method
 float sqrtf_8(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -174,8 +169,7 @@ float sqrtf_8(const float x)
 // See: https://dsp.stackexchange.com/questions/17269/what-approximation-techniques-exist-for-computing-the-square-root
 float sqrtf_9(const float x)
 {
-    union
-    {
+    union {
         float f;
         long i;
     } u;
