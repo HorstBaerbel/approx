@@ -130,10 +130,11 @@ std::ostream &operator<<(std::ostream &os, const Result<T> &r)
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const std::vector<Result<T>> &rs)
 {
-    const auto & fr = rs.front();
+    const auto &fr = rs.front();
     os << "Input range: (" << fr.inputRange.first << ", " << fr.inputRange.second << "), " << fr.samplesInRange << " samples in range" << std::endl;
-    os << "Tested functions:" << std::endl;
-    for (const auto & r : rs)
+    os << "Tested functions:" << std::endl
+       << std::endl;
+    for (const auto &r : rs)
     {
         os << r << std::endl;
     }

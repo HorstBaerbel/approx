@@ -9,6 +9,7 @@
 #include <math.h>
 #include <vector>
 
+// == 1 / log2(10)
 #define ONE_OVER_LOG2_10 0.3010299956639812f
 
 // Calculate the reference value for comparison.
@@ -168,9 +169,9 @@ public:
         std::vector<Result<float>> results;
         results.push_back(run("log10f #0", "Standard library log10f", &log10f_0, &log10f_reference));
         results.push_back(run("log10f #1", "log2(x) / log2(10)", &log10f_1, &log10f_reference));
-        results.push_back(run("log10f #2", "log2(x) ARM forum", &log10f_2, &log10f_reference));
-        results.push_back(run("log10f #3", "log2(x) EBAY divides", &log10f_3, &log10f_reference));
-        results.push_back(run("log10f #4", "log2(x) EBAY multiplies", &log10f_4, &log10f_reference));
+        results.push_back(run("log10f #2", "log2(x) ARM forum / Dr. Paul Beckmann", &log10f_2, &log10f_reference));
+        results.push_back(run("log10f #3", "David Goldberg div", &log10f_3, &log10f_reference));
+        results.push_back(run("log10f #4", "David Goldberg mul", &log10f_4, &log10f_reference));
         return results;
     }
 
