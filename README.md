@@ -6,14 +6,16 @@ Tests some transcendental function approximations, e.g. for sqrt() for speed and
 
 All my own work is under the [MIT License](LICENSE), but I am standing on the shoulders of giants:
 
-* cxxopts ([MIT License](./cxxopts/LICENSE))
-* There's no licenses for most of the approximation functions, but I've tried at least attributing or stating the source in the comments.
+* [cxxopts](https://github.com/jarro2783/cxxopts) ([MIT License](./cxxopts/LICENSE))
+* [sciplot](https://github.com/sciplot/sciplot) ([MIT License](./sciplot/LICENSE))
+* There's no licenses for most of the approximation functions, but I've tried at least attributing them or stating the source in the comments.
 
 ## Building
 
 ### Prequisites
 
 * Clone repo with all submodules using ```git clone --recursive https://github.com/HorstBaerbel/approx``` or update all submodules after cloning using ```git submodule init && git submodule update```.
+* [GNUplot](http://gnuplot.sourceforge.net) installed if you want to plot results.
 
 ### From the command line
 
@@ -39,10 +41,13 @@ make -j$(nproc)
 
 Run ```approx``` with the following options:
 
-* ```log10f```: Test approximations for the float log10 function.
-* ```invsqrtf```: Test approximations for the float 1 / square root function.
-* ```sqrtf```: Test approximations for the float square root function.
-* All other approximations are WIP...
+* ```-h``` or ```--help```: Show help.
+* ```-f FUNC``` or ```--function FUNC```: Test function, where FUNC can be:
+  * ```log10f```: Test approximations for the float log10 function.
+  * ```invsqrtf```: Test approximations for the float 1 / square root function.
+  * ```sqrtf```: Test approximations for the float square root function.
+  * All other approximations are currently WIP...
+* ```-p``` or ```--plot```: Plot results to PDF files using [GNUplot](http://gnuplot.sourceforge.net).
 
 The result is a listing of every function tested, its min/max absolute and relative errors, the standard deviation and the execution time per call, e.g.
 
@@ -70,6 +75,6 @@ Execution time: 1.88797 ns / call
 * Check error calculations.
 * Make timing more reliable / reproduceable.
 * Make command line parameters work.
-* Add more functions (isqrt(x) 1/sqrt(x), 1/x, sin / cos / tan / etc.).
-* Plot error statistics to images (GNUplot?).
-* Write output HTML with results + plots.
+* Add more functions (isqrt(x), 1/x, sin / cos / tan / etc.).
+* Improve error and timing statistics plots.
+* Write output HTML or PDF with multiple results + plots.

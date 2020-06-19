@@ -25,15 +25,13 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -ffast-math -fno-aggressive-loop-optimizations")
 endif()
 
-# Tell the code we're running on PC
-
-add_definitions(-DTARGET_PC)
-
 #-------------------------------------------------------------------------------
 # define targets
 
-#LIST(APPEND APPROX_INCLUDE_DIRECTORIES
-#)
+LIST(APPEND APPROX_INCLUDE_DIRECTORIES
+    ${CMAKE_SOURCE_DIR}/cxxopts/include
+    ${CMAKE_SOURCE_DIR}/sciplot
+)
 
 LIST(APPEND APPROX_SOURCES
     main.cpp

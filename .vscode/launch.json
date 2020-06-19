@@ -12,6 +12,7 @@
             "args": [
                 "-f",
                 "invsqrtf",
+                "-p",
                 "foo.html"
             ],
             "stopAtEntry": false,

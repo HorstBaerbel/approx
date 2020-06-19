@@ -1,5 +1,6 @@
 #pragma once
 
+#include "result.h"
 #include <string>
 #include <functional>
 #include <chrono>
@@ -9,29 +10,11 @@
 #include <iostream>
 
 template <typename T>
-struct Result
-{
-    std::string name;                                   // identifier / short name of the method
-    std::string description;                            // description of the method
-    std::pair<T, T> inputRange = {0, 0};                // range of input values
-    uint64_t samplesInRange = 0;                        //number of points in range (2,n)
-    std::vector<T> absoluteErrors;                      // absolute error abs(approx_f(x) - f(x)) of all calls
-    T minAbsoluteError = std::numeric_limits<T>::max(); // minimum absolute error abs(approx_f(x) - f(x))
-    T maxAbsoluteError = std::numeric_limits<T>::min(); // maximum absolute error abs(approx_f(x) - f(x))
-    std::vector<T> relativeErrors;                      // relative error abs(1 - approx_f(x) / f(x)) of all calls
-    T minRelativeError = std::numeric_limits<T>::max(); // minimum relative error abs(1 - approx_f(x) / f(x))
-    T maxRelativeError = std::numeric_limits<T>::min(); // maximum relative error abs(1 - approx_f(x) / f(x))
-    T stddev = std::numeric_limits<T>::max();           // standard deviation sqrt(sum(sqr(approx_f(x) - f(x))) / (N - 1))
-    uint64_t callNs = 0;                                // execution time for all calls of the function (accumulated)
-    uint64_t overheadNs;                                // estimated loop and data fetch overhead (accumulated)
-};
-
-template <typename T>
 class Test
 {
 public:
-    Test(const std::pair<T, T> &inputRange, uint64_t samplesInRange)
-        : m_inputRange(inputRange)
+    Test(const std::string &suiteName, const std::pair<T, T> &inputRange, uint64_t samplesInRange)
+        : m_suiteName(suiteName), m_inputRange(inputRange)
     {
         if (m_inputRange.first > m_inputRange.second)
         {
@@ -64,6 +47,7 @@ protected:
     Result<T> run(const std::string &name, const std::string &description, Approximation approx, ReferenceFunction ref) const
     {
         Result<T> result;
+        result.suiteName = m_suiteName;
         result.name = name;
         result.description = description;
         result.inputRange = m_inputRange;
@@ -85,6 +69,7 @@ protected:
         {
             long double v = ref(inputData[i]);
             long double a = approx(inputData[i]);
+            result.values.push_back(a);
             // calculate absolute error
             long double absoluteError = abs(a - v);
             result.minAbsoluteError = absoluteError < result.minAbsoluteError ? absoluteError : result.minAbsoluteError;
@@ -110,6 +95,7 @@ protected:
     }
 
 private:
+    std::string m_suiteName;
     std::pair<T, T> m_inputRange = {0, 0};
     uint64_t m_samplesInRange = 0;
     std::vector<T> m_inputValues;
@@ -131,6 +117,7 @@ template <typename T>
 std::ostream &operator<<(std::ostream &os, const std::vector<Result<T>> &rs)
 {
     const auto &fr = rs.front();
+    os << "Testing: " << fr.suiteName << std::endl;
     os << "Input range: (" << fr.inputRange.first << ", " << fr.inputRange.second << "), " << fr.samplesInRange << " samples in range" << std::endl;
     os << "Tested functions:" << std::endl
        << std::endl;

@@ -240,25 +240,25 @@ class SqrtfTest : public Test<float>
 {
 public:
     SqrtfTest(const std::pair<float, float> &inputRange, uint64_t samplesInRange)
-        : Test(fixupInputRange(inputRange), samplesInRange)
+        : Test("sqrtf", fixupInputRange(inputRange), samplesInRange)
     {
     }
 
     std::vector<Result<float>> runTests() const
     {
         std::vector<Result<float>> results;
-        results.push_back(run("sqrtf #0", "Standard library sqrtf", &sqrtf_0, &sqrtf_reference));
-        results.push_back(run("sqrtf #1", "log2(x) + bias", &sqrtf_1, &sqrtf_reference));
-        results.push_back(run("sqrtf #2", "log2(x) + Babylonian", &sqrtf_2, &sqrtf_reference));
-        results.push_back(run("sqrtf #3", "log2(x) + bias + Babylonian", &sqrtf_3, &sqrtf_reference));
-        results.push_back(run("sqrtf #4", "log2(x) + bias + Bakhshali", &sqrtf_4, &sqrtf_reference));
-        results.push_back(run("sqrtf #5", "Quake3 + Newton", &sqrtf_5, &sqrtf_reference));
-        results.push_back(run("sqrtf #6", "Quake3 + Halley", &sqrtf_6, &sqrtf_reference));
-        results.push_back(run("sqrtf #7", "Intel SOC", &sqrtf_7, &sqrtf_reference));
-        results.push_back(run("sqrtf #8", "Intel SOC + Bakhshali", &sqrtf_8, &sqrtf_reference));
-        results.push_back(run("sqrtf #9", "Taylor3", &sqrtf_9, &sqrtf_reference));
-        results.push_back(run("sqrtf #10", "Newton while change", &sqrtf_10, &sqrtf_reference));
-        results.push_back(run("sqrtf #11", "Newton accuracy 0.001", &sqrtf_11, &sqrtf_reference));
+        results.push_back(run("#0", "std sqrtf", &sqrtf_0, &sqrtf_reference));
+        results.push_back(run("#1", "log2(x) + bias", &sqrtf_1, &sqrtf_reference));
+        results.push_back(run("#2", "log2(x) + Babylonian", &sqrtf_2, &sqrtf_reference));
+        results.push_back(run("#3", "log2(x) + bias + Babylonian", &sqrtf_3, &sqrtf_reference));
+        results.push_back(run("#4", "log2(x) + bias + Bakhshali", &sqrtf_4, &sqrtf_reference));
+        results.push_back(run("#5", "Quake3 + Newton", &sqrtf_5, &sqrtf_reference));
+        results.push_back(run("#6", "Quake3 + Halley", &sqrtf_6, &sqrtf_reference));
+        results.push_back(run("#7", "Intel SOC", &sqrtf_7, &sqrtf_reference));
+        results.push_back(run("#8", "Intel SOC + Bakhshali", &sqrtf_8, &sqrtf_reference));
+        results.push_back(run("#9", "Taylor3", &sqrtf_9, &sqrtf_reference));
+        results.push_back(run("#10", "Newton while change", &sqrtf_10, &sqrtf_reference));
+        results.push_back(run("#11", "Newton accuracy 0.001", &sqrtf_11, &sqrtf_reference));
         return results;
     }
 

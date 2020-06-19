@@ -1,3 +1,6 @@
 .vscode/settings.json
 build/
 docs/
+show*.plt
+*.pdf*
+plot*.dat

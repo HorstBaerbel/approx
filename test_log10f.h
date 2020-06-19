@@ -163,18 +163,18 @@ class Log10Test : public Test<float>
 {
 public:
     Log10Test(const std::pair<float, float> &inputRange, uint64_t samplesInRange)
-        : Test(fixupInputRange(inputRange), samplesInRange)
+        : Test("log10f", fixupInputRange(inputRange), samplesInRange)
     {
     }
 
     std::vector<Result<float>> runTests() const
     {
         std::vector<Result<float>> results;
-        results.push_back(run("log10f #0", "Standard library log10f", &log10f_0, &log10f_reference));
-        results.push_back(run("log10f #1", "log2(x) / log2(10)", &log10f_1, &log10f_reference));
-        results.push_back(run("log10f #2", "log2(x) ARM forum / Dr. Paul Beckmann", &log10f_2, &log10f_reference));
-        results.push_back(run("log10f #3", "David Goldberg div", &log10f_3, &log10f_reference));
-        results.push_back(run("log10f #4", "David Goldberg mul", &log10f_4, &log10f_reference));
+        results.push_back(run("#0", "std log10f", &log10f_0, &log10f_reference));
+        results.push_back(run("#1", "log2(x) / log2(10)", &log10f_1, &log10f_reference));
+        results.push_back(run("#2", "log2(x) ARM forum / Dr. Paul Beckmann", &log10f_2, &log10f_reference));
+        results.push_back(run("#3", "David Goldberg div", &log10f_3, &log10f_reference));
+        results.push_back(run("#4", "David Goldberg mul", &log10f_4, &log10f_reference));
         return results;
     }
 

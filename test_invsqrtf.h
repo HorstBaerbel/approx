@@ -71,16 +71,16 @@ class InvSqrtfTest : public Test<float>
 {
 public:
     InvSqrtfTest(const std::pair<float, float> &inputRange, uint64_t samplesInRange)
-        : Test(fixupInputRange(inputRange), samplesInRange)
+        : Test("invsqrtf", fixupInputRange(inputRange), samplesInRange)
     {
     }
 
     std::vector<Result<float>> runTests() const
     {
         std::vector<Result<float>> results;
-        results.push_back(run("invsqrtf #0", "Standard library 1 / sqrtf", &invsqrtf_0, &invsqrtf_reference));
-        results.push_back(run("invsqrtf #1", "Quake3", &invsqrtf_1, &invsqrtf_reference));
-        results.push_back(run("invsqrtf #2", "Quake3 + Newton", &invsqrtf_2, &invsqrtf_reference));
+        results.push_back(run("#0", "std 1 / sqrtf", &invsqrtf_0, &invsqrtf_reference));
+        results.push_back(run("#1", "Quake3", &invsqrtf_1, &invsqrtf_reference));
+        results.push_back(run("#2", "Quake3 + Newton", &invsqrtf_2, &invsqrtf_reference));
         return results;
     }
 

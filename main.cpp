@@ -1,5 +1,9 @@
 // Test spped and precision of transcendental function approximations
 
+#include "test_log10f.h"
+#include "test_invsqrtf.h"
+#include "test_sqrtf.h"
+#include "plot.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -11,20 +15,17 @@ namespace FS_NAMESPACE = std::experimental::filesystem;
 #include <filesystem>
 namespace FS_NAMESPACE = std::tr2::sys;
 #endif
-
-#include "cxxopts/include/cxxopts.hpp"
-#include "test_log10f.h"
-#include "test_invsqrtf.h"
-#include "test_sqrtf.h"
+#include <cxxopts.hpp>
 
 std::string m_outFile;
 std::string m_approxFunc = "sqrtf";
+bool m_plot = false;
 
 bool readArguments(int argc, char **&argv)
 {
     cxxopts::Options options("approx", "Test transcendental function approximations");
     options.allow_unrecognised_options();
-    options.add_options()("h,help", "Print help")("f,function", "Name of function to test. Supported: log10f, invsqrtf and sqrtf", cxxopts::value<std::string>())("o,outfile", "Result CSV file name. Will be overwritten.", cxxopts::value<std::string>())("positional", "", cxxopts::value<std::vector<std::string>>());
+    options.add_options()("h,help", "Print help")("p,plot", "Plot results using GNUplot")("f,function", "Name of function to test. Supported: log10f, invsqrtf and sqrtf", cxxopts::value<std::string>())("o,outfile", "Result CSV file name. Will be overwritten.", cxxopts::value<std::string>())("positional", "", cxxopts::value<std::vector<std::string>>());
     options.parse_positional({"outfile", "positional"});
     auto result = options.parse(argc, argv);
     // check if help was requested
@@ -41,6 +42,10 @@ bool readArguments(int argc, char **&argv)
     {
         std::cout << "No function name passed!" << std::endl;
         return false;
+    }
+    if (result.count("plot"))
+    {
+        m_plot = true;
     }
     // get first positional argument as output file
     if (result.count("outfile"))
@@ -60,10 +65,11 @@ void printUsage()
 {
     // 80 chars:  --------------------------------------------------------------------------------
     std::cout << "approx - Test transcendental function approximations" << std::endl;
-    std::cout << "Usage: approx (-h, -f FUNC) OUTFILE" << std::endl;
+    std::cout << "Usage: approx (-h, -p, -f FUNC) OUTFILE" << std::endl;
     std::cout << "OUTFILE: Result HTML file name. File will be overwritten." << std::endl;
     std::cout << "-h: Print usage help." << std::endl;
     std::cout << "-f FUNC: Function to test. Supported: log10f, invsqrtf and sqrtf." << std::endl;
+    std::cout << "-p: Plot test results using GNUplot." << std::endl;
     std::cout << "Example: approx -f sqrtf bla.html" << std::endl;
 }
 
@@ -82,28 +88,34 @@ int main(int argc, char **argv)
         return -1;
     }
     // check which tests to run
+    std::vector<Result<float>> results;
     if (m_approxFunc == "log10f")
     {
-        Log10Test log10Test(std::make_pair(0, 65535), 1000000);
-        auto results = log10Test.runTests();
+        Log10Test log10Test(std::make_pair(0, 65535), 10000);
+        results = log10Test.runTests();
         std::cout << results;
     }
     else if (m_approxFunc == "invsqrtf")
     {
-        InvSqrtfTest invSqrtTest(std::make_pair(0, 65535), 1000000);
-        auto results = invSqrtTest.runTests();
+        InvSqrtfTest invSqrtTest(std::make_pair(0, 2), 10000);
+        results = invSqrtTest.runTests();
         std::cout << results;
     }
     else if (m_approxFunc == "sqrtf")
     {
-        SqrtfTest sqrtTest(std::make_pair(0, 65535), 1000000);
-        auto results = sqrtTest.runTests();
+        SqrtfTest sqrtTest(std::make_pair(0, 65535), 10000);
+        results = sqrtTest.runTests();
         std::cout << results;
     }
     else
     {
         std::cout << "Unsupported function \"" << m_approxFunc << "\"" << std::endl;
         return -2;
+    }
+    // plot results to file
+    if (m_plot && !results.empty())
+    {
+        plot(results);
     }
     return 0;
 }
