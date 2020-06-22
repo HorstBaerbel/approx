@@ -35,7 +35,7 @@ void plot(const std::vector<Result<T>> &rs, std::function<const std::vector<T> &
     sciplot::plot p;
     p.tics().fontsize(8);
     p.xlabel("").fontsize(8);
-    p.legend().header(title).fontsize(10);
+    p.legend().header(title).fontsize(12);
     p.border().linewidth(1);
     p.ylabel(yLabel).fontsize(8);
     p.yrange(rangePercent.first, rangePercent.second);
@@ -52,9 +52,11 @@ void plotBars(const std::vector<Result<T>> &rs, std::function<T(const Result<T> 
 {
     const auto &fr = rs.front();
     sciplot::plot p;
-    p.legend().header(title);
+    p.tics().fontsize(8);
+    p.xlabel("").fontsize(8);
+    p.legend().header(title).fontsize(12);
     p.border().linewidth(1);
-    p.ylabel(yLabel);
+    p.ylabel(yLabel).fontsize(8);
     std::vector<std::string> x;
     std::vector<T> y;
     for (decltype(rs.size()) i = 0; i < rs.size(); i++)
@@ -62,7 +64,7 @@ void plotBars(const std::vector<Result<T>> &rs, std::function<T(const Result<T> 
         x.push_back("\"" + rs[i].description + "\"");
         y.push_back(valueFunc(rs[i]));
     }
-    p.draw(x, y).with(sciplot::style::boxes).title(title).linewidth(1);
+    p.draw(x, y).with(sciplot::plotstyle::boxes).title(title).linewidth(1);
     p.show();
     //p.save(title + ".pdf");
 }
@@ -72,11 +74,11 @@ void plot(const std::vector<Result<T>> &rs)
 {
     const auto &fr = rs.front();
     std::function<const std::vector<T> &(const Result<T> &)> valueFunc = [](const Result<T> &r) -> const std::vector<T> & { return r.values; };
-    plot(rs, valueFunc, (T)98, fr.suiteName + "_value", "f(x)");
+    plot(rs, valueFunc, (T)98, fr.suiteName + " value", "f(x)");
     std::function<const std::vector<T> &(const Result<T> &)> absFunc = [](const Result<T> &r) -> const std::vector<T> & { return r.absoluteErrors; };
-    plot(rs, absFunc, (T)85, fr.suiteName + "_abs", "abs(f(x) - ref(x))");
+    plot(rs, absFunc, (T)80, fr.suiteName + " abs. error", "abs(f(x) - ref(x))");
     std::function<const std::vector<T> &(const Result<T> &)> relFunc = [](const Result<T> &r) -> const std::vector<T> & { return r.relativeErrors; };
-    plot(rs, relFunc, (T)85, fr.suiteName + "_rel", "abs(1 - f(x) / ref(x))");
+    plot(rs, relFunc, (T)80, fr.suiteName + " rel. error", "abs(1 - f(x) / ref(x))");
     /*std::function<T(const Result<T> &)> callNsFunc = [](const Result<T> &r) { return float(r.callNs - r.overheadNs) / (float)r.samplesInRange; };
     plotBars(rs, callNsFunc, fr.suiteName + "_time", "Execution time / call (ns)");*/
 }
