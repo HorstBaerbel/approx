@@ -53,23 +53,28 @@ Run ```approx``` with the following options:
 The result is a listing of every function tested, its min/max absolute and relative errors, the standard deviation and the execution time per call, e.g.
 
 ```
-Input range: (1.17549e-38, 65535), 1000000 samples in range
+Testing: 1 / sqrtf
+Input range: (1.17549e-38, 2), 100000 samples in range
 Tested functions:
 
-log10f #0 - Standard library log10f
-Absolute error: (3.89436e-13, 4.00927e-07)
-Relative error: (9.97665e-14, 1.20875e-07)
-Standard deviation: 1.30251e-07
-Execution time: 6.11383 ns / call
+#0 - std 1 / sqrtf
+Absolute error: (0, 4.8513e-06), mean: 4.15788e-08, median: 2.86144e-08, variance: 6.7012e-10
+Relative error: (0, 8.84594e-08), mean: 2.94772e-08, median: 2.62721e-08, variance: 1.27401e-10
+Standard deviation: 8.18614e-08
+Execution time: 8.57375 ns / call
 
 ...
 
-log10f #4 - David Goldberg mul
-Absolute error: (4.16929e-10, 0.00154069)
-Relative error: (9.79513e-11, 0.00880727)
-Standard deviation: 0.000579952
-Execution time: 1.88797 ns / call
+#2 - Quake3 + Newton
+Absolute error: (3.1869e-12, 4.01322e+13), mean: 4.01322e+08, median: 1.55585e-06, variance: 1.61059e+27
+Relative error: (3.45024e-12, 4.72321e-06), mean: 1.78569e-06, median: 1.45295e-06, variance: 5.54854e-07
+Standard deviation: 1.2691e+11
+Execution time: 3.26045 ns / call
 ```
+
+Also a result.pdf file will be saved to the current directory:  
+
+![result.png](result.png)
 
 ## Todo
 

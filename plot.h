@@ -93,6 +93,7 @@ void plot(const std::vector<Result<T>>& rs)
 {
     const auto& fr = rs.front();
     sciplot::multiplot mp;
+    mp.size(600, 400);
     mp.title("Results for " + fr.suiteName);
     mp.layout(2, 2);
     std::function<const std::vector<T>&(const Result<T>&)> valueFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.values; };
