@@ -8,13 +8,6 @@
 #include <fstream>
 #include <string>
 #include <cstdio>
-#if defined(__GNUC__) || defined(__clang__)
-#include <experimental/filesystem>
-namespace FS_NAMESPACE = std::experimental::filesystem;
-#elif defined(_MSC_VER)
-#include <filesystem>
-namespace FS_NAMESPACE = std::tr2::sys;
-#endif
 #include <cxxopts.hpp>
 
 std::string m_outFile;
@@ -75,6 +68,16 @@ void printUsage()
 
 // ----- main -------------------------------------------------------------------------------------
 
+template <typename ResultT>
+void plot(const Result<ResultT> &results)
+{
+    // plot results to file using gnuplot
+    if (m_plot && !results.empty())
+    {
+        plot(results);
+    }
+}
+
 int main(int argc, char **argv)
 {
 #ifdef DEBUG
@@ -88,34 +91,31 @@ int main(int argc, char **argv)
         return -1;
     }
     // check which tests to run
-    std::vector<Result<float>> results;
     if (m_approxFunc == "log10f")
     {
-        Log10Test log10Test(std::make_pair(0, 65535), 10000);
-        results = log10Test.runTests();
+        Log10Test log10Test(std::make_pair(0, 65535), 100000);
+        auto results = log10Test.runTests();
         std::cout << results;
+        plot(results);
     }
     else if (m_approxFunc == "invsqrtf")
     {
-        InvSqrtfTest invSqrtTest(std::make_pair(0, 2), 10000);
-        results = invSqrtTest.runTests();
+        InvSqrtfTest invSqrtTest(std::make_pair(0, 2), 100000);
+        auto results = invSqrtTest.runTests();
         std::cout << results;
+        plot(results);
     }
     else if (m_approxFunc == "sqrtf")
     {
-        SqrtfTest sqrtTest(std::make_pair(0, 65535), 10000);
-        results = sqrtTest.runTests();
+        SqrtfTest sqrtTest(std::make_pair(0, 65535), 100000);
+        auto results = sqrtTest.runTests();
         std::cout << results;
+        plot(results);
     }
     else
     {
         std::cout << "Unsupported function \"" << m_approxFunc << "\"" << std::endl;
         return -2;
-    }
-    // plot results to file
-    if (m_plot && !results.empty())
-    {
-        plot(results);
     }
     return 0;
 }

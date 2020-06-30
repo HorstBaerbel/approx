@@ -24,7 +24,7 @@ long double invsqrtf_reference(const long double x)
 // Standard sqrtf function for comparison.
 float invsqrtf_0(const float x)
 {
-    return 1.0 / sqrtf(x);
+    return 1.0F / sqrtf(x);
 }
 
 // Fast inverse square root aka "Quake 3 fast inverse square root".
@@ -34,15 +34,15 @@ float invsqrtf_0(const float x)
 // Similar in: // See: http://www.azillionmonkeys.com/qed/sqroot.html#calcmeth
 float invsqrtf_1(const float x)
 {
-    const float xhalf = 0.5 * x;
+    const float xhalf = 0.5F * x;
     union // get bits for floating value
     {
         float x;
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1);         // gives initial guess y0. use 0x5fe6ec85e7de30da for double
-    u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
+    u.i = 0x5F375A86 - (u.i >> 1);          // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.x = u.x * (1.5F - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return u.x;
 }
 
@@ -61,23 +61,23 @@ float invsqrtf_2(const float x)
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1);         // gives initial guess y0. use 0x5fe6ec85e7de30da for double
-    u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
-    u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
+    u.i = 0x5F375A86 - (u.i >> 1);          // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.x = u.x * (1.5F - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
+    u.x = u.x * (1.5F - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return u.x;
 }
 
-class InvSqrtfTest : public Test<float>
+class InvSqrtfTest : public Test<float, double>
 {
 public:
     InvSqrtfTest(const std::pair<float, float> &inputRange, uint64_t samplesInRange)
-        : Test("invsqrtf", fixupInputRange(inputRange), samplesInRange)
+        : Test("1 / sqrtf", fixupInputRange(inputRange), samplesInRange)
     {
     }
 
-    std::vector<Result<float>> runTests() const
+    std::vector<Result<double>> runTests() const
     {
-        std::vector<Result<float>> results;
+        std::vector<Result<double>> results;
         results.push_back(run("#0", "std 1 / sqrtf", &invsqrtf_0, &invsqrtf_reference));
         results.push_back(run("#1", "Quake3", &invsqrtf_1, &invsqrtf_reference));
         results.push_back(run("#2", "Quake3 + Newton", &invsqrtf_2, &invsqrtf_reference));

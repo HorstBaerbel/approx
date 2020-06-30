@@ -15,7 +15,8 @@ All my own work is under the [MIT License](LICENSE), but I am standing on the sh
 ### Prequisites
 
 * Clone repo with all submodules using ```git clone --recursive https://github.com/HorstBaerbel/approx``` or update all submodules after cloning using ```git submodule init && git submodule update```.
-* [GNUplot](http://gnuplot.sourceforge.net) installed if you want to plot results.
+* Use a C++17-capable compiler.
+* [GNUplot](http://gnuplot.sourceforge.net) 4.2 or higher installed if you want to plot results.
 
 ### From the command line
 

@@ -4,3 +4,4 @@ docs/
 show*.plt
 *.pdf*
 plot*.dat
+multishow*.plt

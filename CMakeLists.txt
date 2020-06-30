@@ -20,7 +20,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
             message(SEND_ERROR "You need at least G++ 8.x to compile approx!")
     endif()
     # set up compiler flags for GCC
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14") # support C++14
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17") # we need C++17
     # make sure we have proper optimizations in release mode
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O2 -ffast-math -fno-aggressive-loop-optimizations")
 endif()
