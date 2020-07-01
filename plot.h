@@ -97,13 +97,13 @@ void plot(const std::vector<Result<T>>& rs)
     mp.title("Results for " + fr.suiteName);
     mp.layout(2, 2);
     std::function<const std::vector<T>&(const Result<T>&)> valueFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.values; };
-    plotLines(mp, rs, valueFunc, (T)98, fr.suiteName + " value", "f(x)");
+    plotLines(mp, rs, valueFunc, (T)98, "value", "f(x)");
     std::function<const std::vector<T>&(const Result<T>&)> absFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.absoluteErrors.values; };
-    plotLines(mp, rs, absFunc, (T)80, fr.suiteName + " abs. error", "|f(x) - F(x)|");
+    plotLines(mp, rs, absFunc, (T)80, "abs. error", "|f(x) - F(x)|");
     std::function<const std::vector<T>&(const Result<T>&)> relFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.relativeErrors.values; };
-    plotLines(mp, rs, relFunc, (T)80, fr.suiteName + " rel. error", "|1 - f(x) / F(x)|");
+    plotLines(mp, rs, relFunc, (T)80, "rel. error", "|1 - f(x) / F(x)|");
     std::function<T(const Result<T>&)> callNsFunc = [](const Result<T>& r) { return float(r.callNs - r.overheadNs) / (float)r.samplesInRange; };
-    plotBars(mp, rs, callNsFunc, fr.suiteName + " time", "Execution time / call [ns]");
+    plotBars(mp, rs, callNsFunc, "", "Execution time / call [ns]");
     mp.show();
     mp.save("result.pdf");
 }
