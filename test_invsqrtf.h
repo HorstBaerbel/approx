@@ -78,7 +78,7 @@ public:
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "std 1 / sqrtf", &invsqrtf_0, &invsqrtf_reference));
+        results.push_back(run("#0", "Reference", &invsqrtf_0, &invsqrtf_reference));
         results.push_back(run("#1", "Quake3", &invsqrtf_1, &invsqrtf_reference));
         results.push_back(run("#2", "Quake3 + Newton", &invsqrtf_2, &invsqrtf_reference));
         return results;

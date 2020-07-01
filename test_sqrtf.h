@@ -253,7 +253,7 @@ public:
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "std sqrtf", &sqrtf_0, &sqrtf_reference));
+        results.push_back(run("#0", "Reference", &sqrtf_0, &sqrtf_reference));
         results.push_back(run("#1", "log2(x) + bias", &sqrtf_1, &sqrtf_reference));
         results.push_back(run("#2", "log2(x) + Babylonian", &sqrtf_2, &sqrtf_reference));
         results.push_back(run("#3", "log2(x) + bias + Babylonian", &sqrtf_3, &sqrtf_reference));
