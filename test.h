@@ -36,15 +36,15 @@ class Test
         // "calibrate" the speed loop
         const TestT* inputData = m_inputValues.data();
         auto startCalib = std::chrono::high_resolution_clock::now();
-        for (uint_fast64_t j = 0; j < 10; ++j)
+        for (uint_fast64_t j = 0; j < LOOPCOUNT; ++j)
         {
             for (uint_fast64_t i = 0; i < m_samplesInRange; ++i)
             {
-                dummy = inputData[i];
+                dummy = dummyTest(inputData[i]);
             }
         }
         auto overheadDuration = std::chrono::high_resolution_clock::now() - startCalib;
-        m_overheadNs = std::chrono::duration_cast<std::chrono::nanoseconds>(overheadDuration).count() / 10;
+        m_overheadNs = std::chrono::duration_cast<std::chrono::nanoseconds>(overheadDuration).count() / LOOPCOUNT;
     }
 
   protected:
@@ -113,12 +113,15 @@ class Test
         const TestT* inputData = m_inputValues.data();
         // start speed measurement
         auto startSpeed = std::chrono::high_resolution_clock::now();
-        for (uint_fast64_t i = 0; i < result.samplesInRange; ++i)
+        for (uint_fast64_t j = 0; j < LOOPCOUNT; ++j)
         {
-            dummy = approx(inputData[i]);
+            for (uint_fast64_t i = 0; i < result.samplesInRange; ++i)
+            {
+                dummy = approx(inputData[i]);
+            }
         }
         auto speedDuration = std::chrono::high_resolution_clock::now() - startSpeed;
-        result.callNs = std::chrono::duration_cast<std::chrono::nanoseconds>(speedDuration).count();
+        result.callNs = std::chrono::duration_cast<std::chrono::nanoseconds>(speedDuration).count() / LOOPCOUNT;
         // now check precision
         for (uint_fast64_t i = 0; i < result.samplesInRange; ++i)
         {
@@ -142,11 +145,18 @@ class Test
     }
 
   private:
+    TestT dummyTest(const TestT v)
+    {
+        return v + m_dummy;
+    }
+
+    static constexpr uint_fast64_t LOOPCOUNT = 10000;
     std::string m_suiteName;
     std::pair<TestT, TestT> m_inputRange = {0, 0};
     uint64_t m_samplesInRange = 0;
     std::vector<TestT> m_inputValues;
     uint64_t m_overheadNs = 0;
+    volatile TestT m_dummy = TestT();
 };
 
 template <typename ResultT>
@@ -168,6 +178,7 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Result<ResultT>>& r
     const auto& fr = rs.front();
     os << "Testing: " << fr.suiteName << std::endl;
     os << "Input range: (" << fr.inputRange.first << ", " << fr.inputRange.second << "), " << fr.samplesInRange << " samples in range" << std::endl;
+    os << "Approximate loop and call overhead (already subtracted): " << float(fr.overheadNs) / float(fr.samplesInRange) << " ns / call" << std::endl;
     os << "Tested functions:" << std::endl
        << std::endl;
     for (const auto& r : rs)

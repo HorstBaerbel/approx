@@ -78,8 +78,6 @@ Also a result.pdf file will be saved to the current directory:
 
 ## Todo
 
-* Check error calculations.
-* Make timing more reliable / reproduceable.
 * Make command line parameters work.
 * Add more functions (isqrt(x), 1/x, sin / cos / tan / etc.).
 * Improve error and timing statistics plots.
