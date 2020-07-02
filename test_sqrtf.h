@@ -36,8 +36,7 @@ float sqrtf_0(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_1(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -51,8 +50,7 @@ float sqrtf_1(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_2(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -72,8 +70,7 @@ float sqrtf_2(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_3(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -93,8 +90,7 @@ float sqrtf_3(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_4(const float x)
 {
-    union
-    {
+    union {
         int i;
         float x;
     } u;
@@ -118,7 +114,7 @@ float sqrtf_5(const float x)
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1);         // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.i = 0x5F375A86 - (u.i >> 1); // gives initial guess y0. use 0x5fe6ec85e7de30da for double
     u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     //u.x = u.x * (1.5 - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return x * u.x;
@@ -146,10 +142,10 @@ float sqrtf_6(const float x)
 // See: http://bits.stephan-brumme.com/squareRoot.html
 float sqrtf_7(const float x)
 {
-    unsigned int i = *(unsigned int *)&x;
+    unsigned int i = *(unsigned int*)&x;
     i += 127 << 23; // adjust bias
-    i >>= 1;        // approximation of square root
-    return *(float *)&i;
+    i >>= 1; // approximation of square root
+    return *(float*)&i;
 }
 
 // Bit twiddling from Intel Software Optimization Cookbook, 2nd edition, page 187
@@ -158,32 +154,26 @@ float sqrtf_7(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Bakhshali_method
 float sqrtf_8(const float x)
 {
-    union
-    {
-        int i;
-        float x;
-    } u;
-    u.x = x;
-    u.i += 127 << 23; // adjust bias
-    u.i >>= 1;        // approximation of square root
-    u.x = (u.x * u.x + x) / (2 * u.x);
-    return u.x;
+    unsigned int i = *(unsigned int*)&x;
+    i += 127 << 23; // adjust bias
+    i >>= 1; // approximation of square root
+    float f = *(float*)&i;
+    return (f * f + x) / (2 * f);
 }
 
 // Taylor series with some bit fiddling?
 // See: https://dsp.stackexchange.com/questions/17269/what-approximation-techniques-exist-for-computing-the-square-root
 float sqrtf_9(const float x)
 {
-    union
-    {
+    union {
         float f;
         long i;
     } u;
     u.f = x;
-    uint32_t intPart = ((u.i) >> 23);    // get biased exponent
-    intPart -= 127;                      // unbias it
+    uint32_t intPart = ((u.i) >> 23); // get biased exponent
+    intPart -= 127; // unbias it
     float n = (float)(u.i & 0x007FFFFF); // mask off exponent leaving 0x800000*(mantissa - 1)
-    n *= 1.192092895507812e-07;          // divide by 0x800000
+    n *= 1.192092895507812e-07; // divide by 0x800000
     float accumulator = 1.0 + 0.49959804148061 * n;
     float xPower = n * n;
     accumulator += -0.12047308243453 * xPower;
@@ -196,8 +186,8 @@ float sqrtf_9(const float x)
         accumulator *= 1.41421356237309504880; // an odd input exponent means an extra sqrt(2) in the output
     }
     u.i = intPart >> 1; // divide exponent by 2, lose LSB
-    u.i += 127;         // rebias exponent
-    u.i <<= 23;         // move biased exponent into exponent bits
+    u.i += 127; // rebias exponent
+    u.i <<= 23; // move biased exponent into exponent bits
     return accumulator * u.f;
 }
 
@@ -244,8 +234,8 @@ float sqrtf_11(const float x)
 
 class SqrtfTest : public Test<float, double>
 {
-public:
-    SqrtfTest(const std::pair<float, float> &inputRange, uint64_t samplesInRange)
+  public:
+    SqrtfTest(const std::pair<float, float>& inputRange, uint64_t samplesInRange)
         : Test("sqrtf", fixupInputRange(inputRange), samplesInRange)
     {
     }
@@ -268,8 +258,8 @@ public:
         return results;
     }
 
-protected:
-    static std::pair<float, float> fixupInputRange(const std::pair<float, float> &range)
+  protected:
+    static std::pair<float, float> fixupInputRange(const std::pair<float, float>& range)
     {
         std::pair<float, float> result;
         result.first = range.first <= 0 ? std::numeric_limits<float>::min() : range.first;

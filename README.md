@@ -48,37 +48,38 @@ Run ```approx``` with the following options:
   * ```invsqrtf```: Test approximations for the float 1 / square root function.
   * ```sqrtf```: Test approximations for the float square root function.
   * All other approximations are currently WIP...
-* ```-p``` or ```--plot```: Plot results to PDF files using [GNUplot](http://gnuplot.sourceforge.net).
+* ```-p FORMAT``` or ```--plot FORMAT```: Plot results using [GNUplot](http://gnuplot.sourceforge.net) where FORMAT can be:
+  * ```pdf```: Output result plots to result.pdf file.
+  * ```html```: Output result table and plots to result.html file.
 
 The result is a listing of every function tested, its min/max absolute and relative errors, the standard deviation and the execution time per call, e.g.
 
 ```
-Testing: 1 / sqrtf
-Input range: (1.17549e-38, 2), 100000 samples in range
+Testing: sqrtf
+Input range: (1.17549e-38, 65535), 10000 samples in range
+Approximate loop and call overhead (already subtracted): 0.2728 ns / call
 Tested functions:
 
-#0 - std 1 / sqrtf
-Absolute error: (0, 4.8513e-06), mean: 4.15788e-08, median: 2.86144e-08, variance: 6.7012e-10
-Relative error: (0, 8.84594e-08), mean: 2.94772e-08, median: 2.62721e-08, variance: 1.27401e-10
-Standard deviation: 8.18614e-08
-Execution time: 8.57375 ns / call
+#0 - Reference
+Absolute error: (0, 7.62852e-06), mean: 3.24438e-06, median: 2.93015e-06, variance: 1.53489e-07
+Relative error: (0, 5.87042e-08), mean: 1.96719e-08, median: 1.87608e-08, variance: 5.40974e-12
+Standard deviation: 3.9181e-06
+Execution time: 1.1701 ns / call
 
 ...
 
-#2 - Quake3 + Newton
-Absolute error: (3.1869e-12, 4.01322e+13), mean: 4.01322e+08, median: 1.55585e-06, variance: 1.61059e+27
-Relative error: (3.45024e-12, 4.72321e-06), mean: 1.78569e-06, median: 1.45295e-06, variance: 5.54854e-07
-Standard deviation: 1.2691e+11
-Execution time: 3.26045 ns / call
+#2 - log2(x) + Babylonian
+Absolute error: (0, 0.000275493), mean: 2.6902e-05, median: 6.12509e-06, variance: 3.31772e-05
+Relative error: (0, 1.52183e-06), mean: 1.7114e-07, median: 3.65627e-08, variance: 1.26044e-09
+Standard deviation: 5.76032e-05
+Execution time: 1.6986 ns / call
 ```
 
-Also a result.pdf file will be saved to the current directory:  
+Also a result.html or result.pdf file will be saved to the current directory if you specified "-p":  
 
 ![result.png](result.png)
 
 ## Todo
 
-* Make command line parameters work.
 * Add more functions (isqrt(x), 1/x, sin / cos / tan / etc.).
 * Improve error and timing statistics plots.
-* Write output HTML or PDF with multiple results + plots.

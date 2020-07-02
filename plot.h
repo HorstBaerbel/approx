@@ -1,9 +1,11 @@
 #pragma once
 
+#include "result.h"
 #include <algorithm>
 #include <functional>
 #include <sciplot/sciplot.hpp>
-#include "result.h"
+#include <string>
+#include <vector>
 
 template <typename T>
 std::pair<T, T> calculateRange(const std::vector<Result<T>>& rs, std::function<T(const Result<T>&)> valueFunc)
@@ -58,8 +60,6 @@ void plotLines(sciplot::multiplot& mp, const std::vector<Result<T>>& rs, std::fu
         p.draw(x, valuesFunc(r)).title(r.description).linewidth(1);
     }
     mp.add(p);
-    //p.show();
-    //p.save(title + ".pdf");
 }
 
 template <typename T>
@@ -70,10 +70,11 @@ void plotBars(sciplot::multiplot& mp, const std::vector<Result<T>>& rs, std::fun
     sciplot::plot p;
     p.tics();
     p.xlabel("");
+    p.xtics().rotate();
     p.legend().header(title);
     p.border().linewidth(1);
     p.ylabel(yLabel);
-    p.yrange(range.first, range.second);
+    p.yrange(0, range.second);
     p.boxwidth(sciplot::boxwidthtype::relative, 0.75F);
     std::vector<std::string> x;
     std::vector<T> y;
@@ -84,26 +85,23 @@ void plotBars(sciplot::multiplot& mp, const std::vector<Result<T>>& rs, std::fun
     }
     p.draw(x, y).with(sciplot::plotstyle::boxes).title(title).fillstyle(sciplot::fillstyle::solid).use(sciplot::plotspecs::USE_AUTO, 2, sciplot::plotspecs::USE_AUTO, 1);
     mp.add(p);
-    //p.show();
-    //p.save(title + ".pdf");
 }
 
 template <typename T>
-void plot(const std::vector<Result<T>>& rs)
+void plot(const std::vector<Result<T>>& rs, const std::string& fileName)
 {
     const auto& fr = rs.front();
     sciplot::multiplot mp;
-    mp.size(600, 400);
+    mp.size(1200, 800);
     mp.title("Results for " + fr.suiteName);
     mp.layout(2, 2);
     std::function<const std::vector<T>&(const Result<T>&)> valueFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.values; };
-    plotLines(mp, rs, valueFunc, (T)98, "value", "f(x)");
+    plotLines(mp, rs, valueFunc, (T)98, "Value", "f(x)");
     std::function<const std::vector<T>&(const Result<T>&)> absFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.absoluteErrors.values; };
-    plotLines(mp, rs, absFunc, (T)80, "abs. error", "|f(x) - F(x)|");
+    plotLines(mp, rs, absFunc, (T)80, "Absolute error", "|f(x) - F(x)|");
     std::function<const std::vector<T>&(const Result<T>&)> relFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.relativeErrors.values; };
-    plotLines(mp, rs, relFunc, (T)80, "rel. error", "|1 - f(x) / F(x)|");
+    plotLines(mp, rs, relFunc, (T)80, "Relative error", "|1 - f(x) / F(x)|");
     std::function<T(const Result<T>&)> callNsFunc = [](const Result<T>& r) { return float(r.callNs - r.overheadNs) / (float)r.samplesInRange; };
-    plotBars(mp, rs, callNsFunc, "", "Execution time / call [ns]");
-    mp.show();
-    mp.save("result.pdf");
+    plotBars(mp, rs, callNsFunc, "", "Execution time [ns / call]");
+    mp.save(fileName);
 }

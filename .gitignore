@@ -5,3 +5,5 @@ show*.plt
 *.pdf*
 plot*.dat
 multishow*.plt
+result.html
+result.svg

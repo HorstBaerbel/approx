@@ -1,25 +1,25 @@
 // Test spped and precision of transcendental function approximations
 
-#include "test_log10f.h"
-#include "test_invsqrtf.h"
-#include "test_sqrtf.h"
+#include "html.h"
 #include "plot.h"
-#include <iostream>
-#include <fstream>
-#include <string>
+#include "test_expf.h"
+#include "test_invsqrtf.h"
+#include "test_log10f.h"
+#include "test_sqrtf.h"
 #include <cstdio>
 #include <cxxopts.hpp>
+#include <fstream>
+#include <iostream>
+#include <string>
 
-std::string m_outFile;
 std::string m_approxFunc = "sqrtf";
-bool m_plot = false;
+std::string m_plotFormat = "";
 
-bool readArguments(int argc, char **&argv)
+bool readArguments(int argc, char**& argv)
 {
     cxxopts::Options options("approx", "Test transcendental function approximations");
     options.allow_unrecognised_options();
-    options.add_options()("h,help", "Print help")("p,plot", "Plot results using GNUplot")("f,function", "Name of function to test. Supported: log10f, invsqrtf and sqrtf", cxxopts::value<std::string>())("o,outfile", "Result CSV file name. Will be overwritten.", cxxopts::value<std::string>())("positional", "", cxxopts::value<std::vector<std::string>>());
-    options.parse_positional({"outfile", "positional"});
+    options.add_options()("h,help", "Print help")("p,plot", "Plot results using GNUplot. Supported: \"pdf\" or \"html\"", cxxopts::value<std::string>())("f,function", "Name of function to test. Supported: \"expf\", \"log10f\", \"invsqrtf\" or \"sqrtf\"", cxxopts::value<std::string>());
     auto result = options.parse(argc, argv);
     // check if help was requested
     if (result.count("help"))
@@ -38,19 +38,8 @@ bool readArguments(int argc, char **&argv)
     }
     if (result.count("plot"))
     {
-        m_plot = true;
+        m_plotFormat = result["plot"].as<std::string>();
     }
-    // get first positional argument as output file
-    if (result.count("outfile"))
-    {
-        m_outFile = result["outfile"].as<std::string>();
-    }
-    else
-    {
-        std::cout << "No output file passed!" << std::endl;
-        return false;
-    }
-
     return true;
 }
 
@@ -58,29 +47,35 @@ void printUsage()
 {
     // 80 chars:  --------------------------------------------------------------------------------
     std::cout << "approx - Test transcendental function approximations" << std::endl;
-    std::cout << "Usage: approx (-h, -p, -f FUNC) OUTFILE" << std::endl;
-    std::cout << "OUTFILE: Result HTML file name. File will be overwritten." << std::endl;
+    std::cout << "Usage: approx (-h, -p FORMAT, -f FUNC)" << std::endl;
     std::cout << "-h: Print usage help." << std::endl;
-    std::cout << "-f FUNC: Function to test. Supported: log10f, invsqrtf and sqrtf." << std::endl;
-    std::cout << "-p: Plot test results using GNUplot." << std::endl;
-    std::cout << "Example: approx -f sqrtf bla.html" << std::endl;
+    std::cout << "-f FUNC: Function to test." << std::endl;
+    std::cout << "FUNC can be \"expf\", \"log10f\", \"invsqrtf\" or \"sqrtf\"." << std::endl;
+    std::cout << "-p FORMAT: Plot test results using GNUplot." << std::endl;
+    std::cout << "FORMAT is the result file format. Either \"pdf\" or \"html\"." << std::endl;
+    std::cout << "Example: approx -f sqrtf -p pdf" << std::endl;
 }
 
 // ----- main -------------------------------------------------------------------------------------
 
 template <typename ResultT>
-void plot(const Result<ResultT> &results)
+void output(const std::vector<Result<ResultT>>& results)
 {
     // plot results to file using gnuplot
-    if (m_plot && !results.empty())
+    if (!m_plotFormat.empty() && !results.empty())
     {
-        plot(results);
+        std::string plotFileName = m_plotFormat == "html" ? "result.svg" : "result.pdf";
+        if (m_plotFormat == "html")
+        {
+            html(results, "result.html", plotFileName);
+        }
+        plot(results, plotFileName);
     }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-#ifdef DEBUG
+#ifdef _DEBUG
     std::cout << "Please compile and run approx in release mode!" << std::endl;
     return -99;
 #endif
@@ -91,26 +86,33 @@ int main(int argc, char **argv)
         return -1;
     }
     // check which tests to run
+    /*if (m_approxFunc == "expf")
+    {
+        ExpfTest expfTest(std::make_pair(-88, 88), 10000);
+        auto results = expfTest.runTests();
+        std::cout << results;
+        output(results);
+    } else */
     if (m_approxFunc == "log10f")
     {
-        Log10Test log10Test(std::make_pair(0, 65535), 100000);
+        Log10Test log10Test(std::make_pair(0, 65535), 10000);
         auto results = log10Test.runTests();
         std::cout << results;
-        plot(results);
+        output(results);
     }
     else if (m_approxFunc == "invsqrtf")
     {
-        InvSqrtfTest invSqrtTest(std::make_pair(0, 2), 100000);
+        InvSqrtfTest invSqrtTest(std::make_pair(0, 2), 10000);
         auto results = invSqrtTest.runTests();
         std::cout << results;
-        plot(results);
+        output(results);
     }
     else if (m_approxFunc == "sqrtf")
     {
-        SqrtfTest sqrtTest(std::make_pair(0, 65535), 100000);
+        SqrtfTest sqrtTest(std::make_pair(0, 65535), 10000);
         auto results = sqrtTest.runTests();
         std::cout << results;
-        plot(results);
+        output(results);
     }
     else
     {
