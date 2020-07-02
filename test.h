@@ -128,13 +128,9 @@ class Test
             ResultT v = ref(inputData[i]);
             ResultT a = approx(inputData[i]);
             result.values.push_back(a);
-            // calculate absolute error
+            // calculate absolute and relative errors
             result.absoluteErrors.values.push_back(abs(a - v));
-            // calculate relative error
-            if (v > 0)
-            {
-                result.relativeErrors.values.push_back(abs(1.0 - a / v));
-            }
+            result.relativeErrors.values.push_back(v != 0.0 ? abs(1.0 - a / v) : 0.0);
         }
         // calculate error statistics
         calculateErrorStatistics(result.absoluteErrors);
