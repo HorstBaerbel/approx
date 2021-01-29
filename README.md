@@ -1,6 +1,6 @@
 # C++ testbed for (transcendental) function approximations
 
-Tests some transcendental function approximations, e.g. for sqrt() for speed and precision. Note that **these are approximations only with varying degrees of precision and speed and all have their own strengths and weaknesses or may have certain range requirements**. I consciously left out tricks like using assembler code or SSE / NEON. These should be obvious and can be used in conjuction with some of the the methods here. Also a good compiler makes some of those optimizations for you anyway. Note that you should **compile with optimizations on** (```-O2 -ffast-math```), otherwise your results will be off!
+Tests some transcendental function approximations, e.g. for sqrt() for speed and precision. Note that **these are approximations only with varying degrees of precision and speed and all have their own strengths and weaknesses or may have certain range requirements**. I consciously left out tricks like using assembler code or SSE / NEON. These should be obvious and can be used in conjuction with some of the the methods here. Also a good compiler makes some of those optimizations for you anyway. Note that you should **compile with optimizations on** (```-O2 -ffast-math```), otherwise your results will be skewed!
 
 ## License
 
@@ -47,14 +47,15 @@ Run ```approx``` with the following options:
   * ```log10f```: Test approximations for the float log10 function.
   * ```invsqrtf```: Test approximations for the float 1 / square root function.
   * ```sqrtf```: Test approximations for the float square root function.
+  * ```sqrti```: Test approximations for the 32-bit square root function.
   * All other approximations are currently WIP...
-* ```-p FORMAT``` or ```--plot FORMAT```: Plot results using [GNUplot](http://gnuplot.sourceforge.net) where FORMAT can be:
+* ```-p FORMAT``` or ```--plot FORMAT```: Plot results using [GNUplot](http://gnuplot.sourceforge.net) (must be installed) where FORMAT can be:
   * ```pdf```: Output result plots to result.pdf file.
   * ```html```: Output result table and plots to result.html file.
 
 The result is a listing of every function tested, its min/max absolute and relative errors, the standard deviation and the execution time per call, e.g.
 
-```
+```console
 Testing: sqrtf
 Input range: (1.17549e-38, 65535), 10000 samples in range
 Approximate loop and call overhead (already subtracted): 0.2728 ns / call
@@ -81,5 +82,5 @@ Also a result.html or result.pdf file will be saved to the current directory if 
 
 ## Todo
 
-* Add more functions (isqrt(x), 1/x, sin / cos / tan / etc.).
+* Add more functions (1/x, sin / cos / tan / etc.).
 * Improve error and timing statistics plots.

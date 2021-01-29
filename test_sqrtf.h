@@ -36,7 +36,8 @@ float sqrtf_0(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_1(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -50,7 +51,8 @@ float sqrtf_1(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_2(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -70,7 +72,8 @@ float sqrtf_2(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_3(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -90,7 +93,8 @@ float sqrtf_3(const float x)
 // See: https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Approximations_that_depend_on_the_floating_point_representation
 float sqrtf_4(const float x)
 {
-    union {
+    union
+    {
         int i;
         float x;
     } u;
@@ -165,7 +169,8 @@ float sqrtf_8(const float x)
 // See: https://dsp.stackexchange.com/questions/17269/what-approximation-techniques-exist-for-computing-the-square-root
 float sqrtf_9(const float x)
 {
-    union {
+    union
+    {
         float f;
         long i;
     } u;
@@ -236,25 +241,25 @@ class SqrtfTest : public Test<float, double>
 {
   public:
     SqrtfTest(const std::pair<float, float>& inputRange, uint64_t samplesInRange)
-        : Test("sqrtf", fixupInputRange(inputRange), samplesInRange)
+        : Test("sqrtf", fixupInputRange(inputRange), samplesInRange, &sqrtf_reference)
     {
     }
 
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &sqrtf_0, &sqrtf_reference));
-        results.push_back(run("#1", "log2(x) + bias", &sqrtf_1, &sqrtf_reference));
-        results.push_back(run("#2", "log2(x) + Babylonian", &sqrtf_2, &sqrtf_reference));
-        results.push_back(run("#3", "log2(x) + bias + Babylonian", &sqrtf_3, &sqrtf_reference));
-        results.push_back(run("#4", "log2(x) + bias + Bakhshali", &sqrtf_4, &sqrtf_reference));
-        results.push_back(run("#5", "Quake3 + Newton", &sqrtf_5, &sqrtf_reference));
-        results.push_back(run("#6", "Quake3 + Halley", &sqrtf_6, &sqrtf_reference));
-        results.push_back(run("#7", "Intel SOC", &sqrtf_7, &sqrtf_reference));
-        results.push_back(run("#8", "Intel SOC + Bakhshali", &sqrtf_8, &sqrtf_reference));
-        results.push_back(run("#9", "Taylor3", &sqrtf_9, &sqrtf_reference));
-        results.push_back(run("#10", "Newton while change", &sqrtf_10, &sqrtf_reference));
-        results.push_back(run("#11", "Newton accuracy 0.001", &sqrtf_11, &sqrtf_reference));
+        results.push_back(run("#0", "Reference", &sqrtf_0));
+        results.push_back(run("#1", "log2(x) + bias", &sqrtf_1));
+        results.push_back(run("#2", "log2(x) + Babylonian", &sqrtf_2));
+        results.push_back(run("#3", "log2(x) + bias + Babylonian", &sqrtf_3));
+        results.push_back(run("#4", "log2(x) + bias + Bakhshali", &sqrtf_4));
+        results.push_back(run("#5", "Quake3 + Newton", &sqrtf_5));
+        results.push_back(run("#6", "Quake3 + Halley", &sqrtf_6));
+        results.push_back(run("#7", "Intel SOC", &sqrtf_7));
+        results.push_back(run("#8", "Intel SOC + Bakhshali", &sqrtf_8));
+        results.push_back(run("#9", "Taylor3", &sqrtf_9));
+        results.push_back(run("#10", "Newton while change", &sqrtf_10));
+        results.push_back(run("#11", "Newton accuracy 0.001", &sqrtf_11));
         return results;
     }
 

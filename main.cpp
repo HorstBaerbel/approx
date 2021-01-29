@@ -6,6 +6,7 @@
 #include "test_invsqrtf.h"
 #include "test_log10f.h"
 #include "test_sqrtf.h"
+#include "test_sqrti.h"
 #include <cstdio>
 #include <cxxopts.hpp>
 #include <fstream>
@@ -19,7 +20,7 @@ bool readArguments(int argc, char**& argv)
 {
     cxxopts::Options options("approx", "Test transcendental function approximations");
     options.allow_unrecognised_options();
-    options.add_options()("h,help", "Print help")("p,plot", "Plot results using GNUplot. Supported: \"pdf\" or \"html\"", cxxopts::value<std::string>())("f,function", "Name of function to test. Supported: \"expf\", \"log10f\", \"invsqrtf\" or \"sqrtf\"", cxxopts::value<std::string>());
+    options.add_options()("h,help", "Print help")("p,plot", "Plot results using GNUplot. Supported: \"pdf\" or \"html\"", cxxopts::value<std::string>())("f,function", "Name of function to test. Supported: \"expf\", \"log10f\", \"invsqrtf\", \"sqrti\" or \"sqrtf\"", cxxopts::value<std::string>());
     auto result = options.parse(argc, argv);
     // check if help was requested
     if (result.count("help"))
@@ -50,7 +51,7 @@ void printUsage()
     std::cout << "Usage: approx (-h, -p FORMAT, -f FUNC)" << std::endl;
     std::cout << "-h: Print usage help." << std::endl;
     std::cout << "-f FUNC: Function to test." << std::endl;
-    std::cout << "FUNC can be \"expf\", \"log10f\", \"invsqrtf\" or \"sqrtf\"." << std::endl;
+    std::cout << "FUNC can be \"expf\", \"log10f\", \"invsqrtf\", \"sqrtf\" or \"sqrti\"." << std::endl;
     std::cout << "-p FORMAT: Plot test results using GNUplot." << std::endl;
     std::cout << "FORMAT is the result file format. Either \"pdf\" or \"html\"." << std::endl;
     std::cout << "Example: approx -f sqrtf -p pdf" << std::endl;
@@ -110,6 +111,13 @@ int main(int argc, char** argv)
     else if (m_approxFunc == "sqrtf")
     {
         SqrtfTest sqrtTest(std::make_pair(0, 65535), 10000);
+        auto results = sqrtTest.runTests();
+        std::cout << results;
+        output(results);
+    }
+    else if (m_approxFunc == "sqrti")
+    {
+        SqrtiTest sqrtTest(std::make_pair(0, 0xFFFFFFFF), 10000);
         auto results = sqrtTest.runTests();
         std::cout << results;
         output(results);

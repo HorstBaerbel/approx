@@ -18,7 +18,8 @@ template <typename TestT, typename ResultT = TestT>
 class Test
 {
   public:
-    Test(const std::string& suiteName, const std::pair<TestT, TestT>& inputRange, uint64_t samplesInRange)
+    template <typename ReferenceFunction>
+    Test(const std::string& suiteName, const std::pair<TestT, TestT>& inputRange, uint64_t samplesInRange, ReferenceFunction ref)
         : m_suiteName(suiteName), m_inputRange(inputRange)
     {
         if (m_inputRange.first > m_inputRange.second)
@@ -31,10 +32,15 @@ class Test
         {
             m_inputValues.push_back(m_inputRange.first + ((m_inputRange.second - m_inputRange.first) * i) / (m_samplesInRange - 1));
         }
+        // generate reference result values
+        const TestT* inputData = m_inputValues.data();
+        for (uint_fast64_t i = 0; i < m_samplesInRange; ++i)
+        {
+            m_referenceValues.push_back(ref(inputData[i]));
+        }
         // make sure we use a volatile destination, so values are not thrown away.
         volatile TestT dummy = 0;
         // "calibrate" the speed loop
-        const TestT* inputData = m_inputValues.data();
         auto startCalib = std::chrono::high_resolution_clock::now();
         for (uint_fast64_t j = 0; j < LOOPCOUNT; ++j)
         {
@@ -98,8 +104,8 @@ class Test
         errors.variance = variance(errors.values);
     }
 
-    template <typename Approximation, typename ReferenceFunction>
-    Result<ResultT> run(const std::string& name, const std::string& description, Approximation approx, ReferenceFunction ref) const
+    template <typename Approximation>
+    Result<ResultT> run(const std::string& name, const std::string& description, Approximation approx) const
     {
         Result<ResultT> result;
         result.suiteName = m_suiteName;
@@ -125,10 +131,10 @@ class Test
         // now check precision
         for (uint_fast64_t i = 0; i < result.samplesInRange; ++i)
         {
-            ResultT v = ref(inputData[i]);
             ResultT a = approx(inputData[i]);
             result.values.push_back(a);
             // calculate absolute and relative errors
+            auto v = m_referenceValues[i];
             result.absoluteErrors.values.push_back(abs(a - v));
             result.relativeErrors.values.push_back(v != 0.0 ? abs(1.0 - a / v) : 0.0);
         }
@@ -151,6 +157,7 @@ class Test
     std::pair<TestT, TestT> m_inputRange = {0, 0};
     uint64_t m_samplesInRange = 0;
     std::vector<TestT> m_inputValues;
+    std::vector<ResultT> m_referenceValues;
     uint64_t m_overheadNs = 0;
     volatile TestT m_dummy = TestT();
 };

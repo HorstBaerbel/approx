@@ -70,15 +70,15 @@ class ExpfTest : public Test<float, double>
 {
   public:
     ExpfTest(const std::pair<float, float>& inputRange, uint64_t samplesInRange)
-        : Test("e^x", fixupInputRange(inputRange), samplesInRange)
+        : Test("e^x", fixupInputRange(inputRange), samplesInRange, &expf_reference)
     {
     }
 
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &expf_0, &expf_reference));
-        results.push_back(run("#1", "Pseudorandom monomial", &expf_1, &expf_reference));
+        results.push_back(run("#0", "Reference", &expf_0));
+        results.push_back(run("#1", "Pseudorandom monomial", &expf_1));
         return results;
     }
 

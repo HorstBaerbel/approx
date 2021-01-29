@@ -45,7 +45,8 @@ std::pair<T, T> calculateMedianRange(const std::vector<Result<T>>& rs, std::func
 template <typename T>
 void plotLines(sciplot::multiplot& mp, const std::vector<Result<T>>& rs, std::function<const std::vector<T>&(const Result<T>&)> valuesFunc, T sizePercent, const std::string& title, const std::string& yLabel)
 {
-    const auto rangePercent = calculateMedianRange(rs, valuesFunc, sizePercent);
+    auto rangePercent = calculateMedianRange(rs, valuesFunc, sizePercent);
+    rangePercent.second = rangePercent.second - rangePercent.first == 0 ? rangePercent.first + 1 : rangePercent.second;
     const auto& fr = rs.front();
     const auto x = sciplot::linspace(fr.inputRange.first, fr.inputRange.second, fr.samplesInRange);
     sciplot::plot p;
@@ -65,7 +66,8 @@ void plotLines(sciplot::multiplot& mp, const std::vector<Result<T>>& rs, std::fu
 template <typename T>
 void plotBars(sciplot::multiplot& mp, const std::vector<Result<T>>& rs, std::function<T(const Result<T>&)> valueFunc, const std::string& title, const std::string& yLabel)
 {
-    const auto range = calculateRange(rs, valueFunc);
+    auto range = calculateRange(rs, valueFunc);
+    range.second = range.second - range.first == 0 ? range.first + 1 : range.second;
     const auto& fr = rs.front();
     sciplot::plot p;
     p.tics();

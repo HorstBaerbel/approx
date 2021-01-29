@@ -41,7 +41,7 @@ float invsqrtf_1(const float x)
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1);          // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.i = 0x5F375A86 - (u.i >> 1); // gives initial guess y0. use 0x5fe6ec85e7de30da for double
     u.x = u.x * (1.5F - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return u.x;
 }
@@ -61,7 +61,7 @@ float invsqrtf_2(const float x)
         int i;
     } u;
     u.x = x;
-    u.i = 0x5F375A86 - (u.i >> 1);          // gives initial guess y0. use 0x5fe6ec85e7de30da for double
+    u.i = 0x5F375A86 - (u.i >> 1); // gives initial guess y0. use 0x5fe6ec85e7de30da for double
     u.x = u.x * (1.5F - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     u.x = u.x * (1.5F - xhalf * u.x * u.x); // Newton method, repeating increases accuracy
     return u.x;
@@ -69,23 +69,23 @@ float invsqrtf_2(const float x)
 
 class InvSqrtfTest : public Test<float, double>
 {
-public:
-    InvSqrtfTest(const std::pair<float, float> &inputRange, uint64_t samplesInRange)
-        : Test("1 / sqrtf", fixupInputRange(inputRange), samplesInRange)
+  public:
+    InvSqrtfTest(const std::pair<float, float>& inputRange, uint64_t samplesInRange)
+        : Test("1 / sqrtf", fixupInputRange(inputRange), samplesInRange, &invsqrtf_reference)
     {
     }
 
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &invsqrtf_0, &invsqrtf_reference));
-        results.push_back(run("#1", "Quake3", &invsqrtf_1, &invsqrtf_reference));
-        results.push_back(run("#2", "Quake3 + Newton", &invsqrtf_2, &invsqrtf_reference));
+        results.push_back(run("#0", "Reference", &invsqrtf_0));
+        results.push_back(run("#1", "Quake3", &invsqrtf_1));
+        results.push_back(run("#2", "Quake3 + Newton", &invsqrtf_2));
         return results;
     }
 
-protected:
-    static std::pair<float, float> fixupInputRange(const std::pair<float, float> &range)
+  protected:
+    static std::pair<float, float> fixupInputRange(const std::pair<float, float>& range)
     {
         std::pair<float, float> result;
         result.first = range.first <= 0 ? std::numeric_limits<float>::min() : range.first;
