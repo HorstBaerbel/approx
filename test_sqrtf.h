@@ -214,7 +214,7 @@ float sqrtf_10(const float x)
 // See: http://www.cs.uni.edu/~jacobson/C++/newton.html
 float sqrtf_11(const float x)
 {
-    const float ACCURACY = 0.001;
+    const float ACCURACY = 0.01;
     float lower, upper, guess;
     if (x < 1)
     {
@@ -248,7 +248,7 @@ class SqrtfTest : public Test<float, double>
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &sqrtf_0));
+        results.push_back(run("#0", "Reference (std::sqrtf)", &sqrtf_0));
         results.push_back(run("#1", "log2(x) + bias", &sqrtf_1));
         results.push_back(run("#2", "log2(x) + Babylonian", &sqrtf_2));
         results.push_back(run("#3", "log2(x) + bias + Babylonian", &sqrtf_3));
@@ -259,7 +259,7 @@ class SqrtfTest : public Test<float, double>
         results.push_back(run("#8", "Intel SOC + Bakhshali", &sqrtf_8));
         results.push_back(run("#9", "Taylor3", &sqrtf_9));
         results.push_back(run("#10", "Newton while change", &sqrtf_10));
-        results.push_back(run("#11", "Newton accuracy 0.001", &sqrtf_11));
+        results.push_back(run("#11", "Newton accuracy 0.01", &sqrtf_11));
         return results;
     }
 

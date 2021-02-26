@@ -77,7 +77,7 @@ class ExpfTest : public Test<float, double>
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &expf_0));
+        results.push_back(run("#0", "Reference (std::expf)", &expf_0));
         results.push_back(run("#1", "Pseudorandom monomial", &expf_1));
         return results;
     }

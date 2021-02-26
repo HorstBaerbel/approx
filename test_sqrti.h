@@ -154,7 +154,7 @@ class SqrtiTest : public Test<uint32_t, double>
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &sqrti_reference));
+        results.push_back(run("#0", "Reference (std::sqrt)", &sqrti_reference));
         results.push_back(run("#1", "Optimized binomial theorem", &sqrti_1));
         results.push_back(run("#2", "Abacus algorithm", &sqrti_2));
         results.push_back(run("#3", "Crenshaw Embedded 1998", &sqrti_3));

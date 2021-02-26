@@ -78,7 +78,7 @@ class InvSqrtfTest : public Test<float, double>
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &invsqrtf_0));
+        results.push_back(run("#0", "Reference (1/std::sqrtf)", &invsqrtf_0));
         results.push_back(run("#1", "Quake3", &invsqrtf_1));
         results.push_back(run("#2", "Quake3 + Newton", &invsqrtf_2));
         return results;

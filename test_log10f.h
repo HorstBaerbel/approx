@@ -172,7 +172,7 @@ class Log10Test : public Test<float, double>
     std::vector<Result<double>> runTests() const
     {
         std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference", &log10f_0));
+        results.push_back(run("#0", "Reference (std::log10f)", &log10f_0));
         results.push_back(run("#1", "log2(x) / log2(10)", &log10f_1));
         results.push_back(run("#2", "ARM forum / Dr. Paul Beckmann", &log10f_2));
         results.push_back(run("#3", "David Goldberg div", &log10f_3));
