@@ -7,6 +7,7 @@
 // All functions operate on float values, but some can be used on double values too.
 
 #include "test.h"
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <vector>
@@ -38,7 +39,7 @@ float expf_1(const float x)
     float x0 = abs(x);
     int k = ceil((x0 / M_LN2) - 0.5);
     float r = x0 - (k * M_LN2);
-    std::vector<float> coeffs = {
+    static const std::array<float, 14> coeffs = {
         1.000000000000000,
         1.000000000000000,
         0.500000000000002,
