@@ -9,44 +9,43 @@
 #include <math.h>
 #include <numeric>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 /// @brief Test suite base class. Use to derive test suites from.
-/// @tparam TestT Test variable / input / output type (e.g. float).
-/// @tparam ResultT Type the results are stored in. Use a wider type for storing results with increased precision (e.g double).
-template <typename TestT, typename ResultT = TestT>
+/// @tparam InputT Test input variable type (e.g. float, int or std::pair<float, float>).
+/// @tparam OutputT Test output type (e.g. float).
+/// @tparam StorageT Type the results are stored in. Use a wider type for storing results with increased precision (e.g double).
+template <typename InputT, typename OutputT, typename StorageT = OutputT>
 class Test
 {
   public:
-    template <typename ReferenceFunction>
-    Test(const std::string& suiteName, const std::pair<TestT, TestT>& inputRange, uint64_t samplesInRange, ReferenceFunction ref)
-        : m_suiteName(suiteName), m_inputRange(inputRange)
+    using input_t = InputT;
+    using input_range_t = std::pair<input_t, input_t>;
+    using input_generator_t = std::function<std::vector<input_t>(const input_range_t&, uint64_t)>;
+    using output_t = OutputT;
+    using storage_t = StorageT;
+    using storage_range_t = std::pair<storage_t, storage_t>;
+
+    template <typename ReferenceFunction, typename DummyFunction>
+    Test(const std::string& suiteName, input_generator_t inputGenerator, input_range_t inputRange, uint64_t samplesInRange, ReferenceFunction refFunc, DummyFunction dummyFunc)
+        : m_suiteName(suiteName), m_inputRange(inputRange), m_inputValues(inputGenerator(inputRange, samplesInRange))
     {
-        if (m_inputRange.first > m_inputRange.second)
-        {
-            std::swap(m_inputRange.first, m_inputRange.second);
-        }
-        m_samplesInRange = samplesInRange < 2 ? 2 : samplesInRange;
-        // generate input values
-        for (uint_fast64_t i = 0; i < m_samplesInRange; ++i)
-        {
-            m_inputValues.push_back(m_inputRange.first + ((m_inputRange.second - m_inputRange.first) * i) / (m_samplesInRange - 1));
-        }
         // generate reference result values
-        const TestT* inputData = m_inputValues.data();
-        for (uint_fast64_t i = 0; i < m_samplesInRange; ++i)
+        const input_t* inputData = m_inputValues.data();
+        for (uint_fast64_t i = 0; i < m_inputValues.size(); ++i)
         {
-            m_referenceValues.push_back(ref(inputData[i]));
+            m_referenceValues.push_back(refFunc(inputData[i]));
         }
         // make sure we use a volatile destination, so values are not thrown away.
-        volatile TestT dummy = 0;
+        volatile storage_t dummy{};
         // "calibrate" the speed loop
         auto startCalib = std::chrono::high_resolution_clock::now();
         for (uint_fast64_t j = 0; j < LOOPCOUNT; ++j)
         {
-            for (uint_fast64_t i = 0; i < m_samplesInRange; ++i)
+            for (uint_fast64_t i = 0; i < m_inputValues.size(); ++i)
             {
-                dummy = dummyTest(inputData[i]);
+                dummy = dummyFunc(inputData[i]);
             }
         }
         auto overheadDuration = std::chrono::high_resolution_clock::now() - startCalib;
@@ -54,16 +53,16 @@ class Test
     }
 
   protected:
-    static std::pair<ResultT, ResultT> minmax(const std::vector<ResultT>& values)
+    static storage_range_t minmax(const std::vector<storage_t>& values)
     {
         // calculate min / max percentage range of values
         auto mme = std::minmax_element(values.cbegin(), values.cend());
         return std::make_pair(*mme.first, *mme.second);
     }
 
-    static ResultT sumOfSquares(const std::vector<ResultT>& values)
+    static storage_t sumOfSquares(const std::vector<storage_t>& values)
     {
-        ResultT sqrValue = ResultT();
+        storage_t sqrValue = storage_t();
         for (const auto v : values)
         {
             sqrValue += v * v;
@@ -71,30 +70,30 @@ class Test
         return sqrValue;
     }
 
-    static ResultT stddev(const std::vector<ResultT>& values)
+    static storage_t stddev(const std::vector<storage_t>& values)
     {
         return sqrt(sumOfSquares(values) / (values.size() - 1));
     }
 
-    static ResultT mean(const std::vector<ResultT>& values)
+    static storage_t mean(const std::vector<storage_t>& values)
     {
-        return std::accumulate(values.cbegin(), values.cend(), ResultT()) / values.size();
+        return std::accumulate(values.cbegin(), values.cend(), storage_t()) / values.size();
     }
 
-    static ResultT median(const std::vector<ResultT>& values)
+    static storage_t median(const std::vector<storage_t>& values)
     {
-        std::vector<ResultT> sortvalues = values;
+        std::vector<storage_t> sortvalues = values;
         std::nth_element(sortvalues.begin(), sortvalues.begin() + sortvalues.size() / 2, sortvalues.end());
         auto medianIt = sortvalues.cbegin() + sortvalues.size() / 2;
         return *medianIt;
     }
 
-    static ResultT variance(const std::vector<ResultT>& values)
+    static storage_t variance(const std::vector<storage_t>& values)
     {
         return sumOfSquares(values) - std::pow(mean(values), 2);
     }
 
-    static void calculateErrorStatistics(typename Result<ResultT>::Errors& errors)
+    static void calculateErrorStatistics(typename Result<input_t, storage_t>::Errors& errors)
     {
         auto minmaxValue = minmax(errors.values);
         errors.minimum = minmaxValue.first;
@@ -105,18 +104,18 @@ class Test
     }
 
     template <typename Approximation>
-    Result<ResultT> run(const std::string& name, const std::string& description, Approximation approx) const
+    Result<input_t, storage_t> run(const std::string& name, const std::string& description, Approximation approx) const
     {
-        Result<ResultT> result;
+        Result<input_t, storage_t> result;
         result.suiteName = m_suiteName;
         result.name = name;
         result.description = description;
         result.inputRange = m_inputRange;
-        result.samplesInRange = m_samplesInRange;
+        result.samplesInRange = m_inputValues.size();
         result.overheadNs = m_overheadNs;
         // make sure we use a volatile destination, so values are not thrown away.
-        volatile TestT dummy = 0;
-        const TestT* inputData = m_inputValues.data();
+        volatile storage_t dummy{};
+        const input_t* inputData = m_inputValues.data();
         // start speed measurement
         auto startSpeed = std::chrono::high_resolution_clock::now();
         for (uint_fast64_t j = 0; j < LOOPCOUNT; ++j)
@@ -131,7 +130,7 @@ class Test
         // now check precision
         for (uint_fast64_t i = 0; i < result.samplesInRange; ++i)
         {
-            ResultT a = approx(inputData[i]);
+            storage_t a = approx(inputData[i]);
             result.values.push_back(a);
             // calculate absolute and relative errors
             auto v = m_referenceValues[i];
@@ -147,23 +146,17 @@ class Test
     }
 
   private:
-    TestT dummyTest(const TestT v)
-    {
-        return v + m_dummy;
-    }
-
     static constexpr uint_fast64_t LOOPCOUNT = 10000;
-    std::string m_suiteName;
-    std::pair<TestT, TestT> m_inputRange = {0, 0};
-    uint64_t m_samplesInRange = 0;
-    std::vector<TestT> m_inputValues;
-    std::vector<ResultT> m_referenceValues;
+    const std::string m_suiteName;
+    const input_range_t m_inputRange{};
+    const std::vector<input_t> m_inputValues;
+    std::vector<storage_t> m_referenceValues;
     uint64_t m_overheadNs = 0;
-    volatile TestT m_dummy = TestT();
+    volatile input_t m_dummy{};
 };
 
-template <typename ResultT>
-std::ostream& operator<<(std::ostream& os, const Result<ResultT>& r)
+template <typename InputT, typename StorageT>
+std::ostream& operator<<(std::ostream& os, const Result<InputT, StorageT>& r)
 {
     os << r.name << " - " << r.description << std::endl;
     auto& ae = r.absoluteErrors;
@@ -175,8 +168,15 @@ std::ostream& operator<<(std::ostream& os, const Result<ResultT>& r)
     return os;
 }
 
-template <typename ResultT>
-std::ostream& operator<<(std::ostream& os, const std::vector<Result<ResultT>>& rs)
+template <typename InputT>
+std::ostream& operator<<(std::ostream& os, const std::pair<InputT, InputT>& v)
+{
+    os << "(" << v.first << ", " << v.second << ")";
+    return os;
+}
+
+template <typename InputT, typename StorageT>
+std::ostream& operator<<(std::ostream& os, const std::vector<Result<InputT, StorageT>>& rs)
 {
     const auto& fr = rs.front();
     os << "Testing: " << fr.suiteName << std::endl;

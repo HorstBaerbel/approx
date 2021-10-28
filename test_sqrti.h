@@ -143,18 +143,20 @@ uint32_t sqrti_5(uint32_t n)
     }
 }
 
-class SqrtiTest : public Test<uint32_t, double>
+class SqrtiTest : public Test<uint32_t, uint32_t, double>
 {
   public:
-    SqrtiTest(const std::pair<uint32_t, uint32_t>& inputRange, uint64_t samplesInRange)
-        : Test("sqrti", fixupInputRange(inputRange), samplesInRange, &sqrti_reference)
+    SqrtiTest(input_generator_t inputGenerator, const input_range_t& inputRange, uint64_t samplesInRange)
+        : Test(
+            "sqrti", inputGenerator,
+            fixupInputRange(inputRange), samplesInRange, &sqrti_reference, &dummyFunc)
     {
     }
 
-    std::vector<Result<double>> runTests() const
+    std::vector<Result<input_t, storage_t>> runTests() const
     {
-        std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference (std::sqrt)", &sqrti_reference));
+        std::vector<Result<input_t, storage_t>> results;
+        results.push_back(run("#0", "std::sqrt", &sqrti_reference));
         results.push_back(run("#1", "Optimized binomial theorem", &sqrti_1));
         results.push_back(run("#2", "Abacus algorithm", &sqrti_2));
         results.push_back(run("#3", "Crenshaw Embedded 1998", &sqrti_3));
@@ -164,13 +166,18 @@ class SqrtiTest : public Test<uint32_t, double>
     }
 
   protected:
-    static std::pair<uint32_t, uint32_t> fixupInputRange(const std::pair<uint32_t, uint32_t>& range)
+    static input_t dummyFunc(const input_t x)
     {
-        std::pair<uint32_t, uint32_t> result;
-        result.first = range.first <= 0 ? std::numeric_limits<uint32_t>::min() : range.first;
-        result.second = range.second <= 0 ? std::numeric_limits<uint32_t>::min() : range.second;
-        result.first = result.first > std::numeric_limits<uint32_t>::max() ? std::numeric_limits<uint32_t>::max() : result.first;
-        result.second = result.second > std::numeric_limits<uint32_t>::max() ? std::numeric_limits<uint32_t>::max() : result.second;
+        return x;
+    }
+
+    static input_range_t fixupInputRange(const input_range_t& range)
+    {
+        input_range_t result;
+        result.first = range.first <= 0 ? std::numeric_limits<input_t>::min() : range.first;
+        result.second = range.second <= 0 ? std::numeric_limits<input_t>::min() : range.second;
+        result.first = result.first > std::numeric_limits<input_t>::max() ? std::numeric_limits<input_t>::max() : result.first;
+        result.second = result.second > std::numeric_limits<input_t>::max() ? std::numeric_limits<input_t>::max() : result.second;
         return result;
     }
 };

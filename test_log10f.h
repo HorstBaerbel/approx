@@ -161,18 +161,20 @@ float log10f_4(float x)
     return lg2 * ONE_OVER_LOG2_10;
 }
 
-class Log10Test : public Test<float, double>
+class Log10Test : public Test<float, float, double>
 {
   public:
-    Log10Test(const std::pair<float, float>& inputRange, uint64_t samplesInRange)
-        : Test("log10f", fixupInputRange(inputRange), samplesInRange, &log10f_reference)
+    Log10Test(input_generator_t inputGenerator, const input_range_t& inputRange, uint64_t samplesInRange)
+        : Test(
+            "log10f", inputGenerator,
+            fixupInputRange(inputRange), samplesInRange, &log10f_reference, &dummyFunc)
     {
     }
 
-    std::vector<Result<double>> runTests() const
+    std::vector<Result<input_t, storage_t>> runTests() const
     {
-        std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference (std::log10f)", &log10f_0));
+        std::vector<Result<input_t, storage_t>> results;
+        results.push_back(run("#0", "std::log10f", &log10f_0));
         results.push_back(run("#1", "log2(x) / log2(10)", &log10f_1));
         results.push_back(run("#2", "ARM forum / Dr. Paul Beckmann", &log10f_2));
         results.push_back(run("#3", "David Goldberg div", &log10f_3));
@@ -181,13 +183,18 @@ class Log10Test : public Test<float, double>
     }
 
   protected:
-    static std::pair<float, float> fixupInputRange(const std::pair<float, float>& range)
+    static input_t dummyFunc(const input_t x)
     {
-        std::pair<float, float> result;
-        result.first = range.first <= 0 ? std::numeric_limits<float>::min() : range.first;
-        result.second = range.second <= 0 ? std::numeric_limits<float>::min() : range.second;
-        result.first = result.first > std::numeric_limits<float>::max() ? std::numeric_limits<float>::max() : result.first;
-        result.second = result.second > std::numeric_limits<float>::max() ? std::numeric_limits<float>::max() : result.second;
+        return x;
+    }
+
+    static input_range_t fixupInputRange(const input_range_t& range)
+    {
+        input_range_t result;
+        result.first = range.first <= 0 ? std::numeric_limits<input_t>::min() : range.first;
+        result.second = range.second <= 0 ? std::numeric_limits<input_t>::min() : range.second;
+        result.first = result.first > std::numeric_limits<input_t>::max() ? std::numeric_limits<input_t>::max() : result.first;
+        result.second = result.second > std::numeric_limits<input_t>::max() ? std::numeric_limits<input_t>::max() : result.second;
         return result;
     }
 };

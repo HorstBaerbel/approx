@@ -67,30 +67,37 @@ float expf_1(const float x)
     return pn;
 }
 
-class ExpfTest : public Test<float, double>
+class ExpfTest : public Test<float, float, double>
 {
   public:
-    ExpfTest(const std::pair<float, float>& inputRange, uint64_t samplesInRange)
-        : Test("e^x", fixupInputRange(inputRange), samplesInRange, &expf_reference)
+    ExpfTest(input_generator_t inputGenerator, const input_range_t& inputRange, uint64_t samplesInRange)
+        : Test(
+            "e^x", inputGenerator,
+            fixupInputRange(inputRange), samplesInRange, &expf_reference, &dummyFunc)
     {
     }
 
-    std::vector<Result<double>> runTests() const
+    std::vector<Result<input_t, storage_t>> runTests() const
     {
-        std::vector<Result<double>> results;
-        results.push_back(run("#0", "Reference (std::expf)", &expf_0));
+        std::vector<Result<input_t, storage_t>> results;
+        results.push_back(run("#0", "std::expf", &expf_0));
         results.push_back(run("#1", "Pseudorandom monomial", &expf_1));
         return results;
     }
 
   protected:
-    static std::pair<float, float> fixupInputRange(const std::pair<float, float>& range)
+    static input_t dummyFunc(const input_t x)
     {
-        std::pair<float, float> result;
-        result.first = range.first <= 0 ? std::numeric_limits<float>::min() : range.first;
-        result.second = range.second <= 0 ? std::numeric_limits<float>::min() : range.second;
-        result.first = result.first > std::numeric_limits<float>::max() ? std::numeric_limits<float>::max() : result.first;
-        result.second = result.second > std::numeric_limits<float>::max() ? std::numeric_limits<float>::max() : result.second;
+        return x;
+    }
+
+    static input_range_t fixupInputRange(const input_range_t& range)
+    {
+        input_range_t result;
+        result.first = range.first <= 0 ? std::numeric_limits<input_t>::min() : range.first;
+        result.second = range.second <= 0 ? std::numeric_limits<input_t>::min() : range.second;
+        result.first = result.first > std::numeric_limits<input_t>::max() ? std::numeric_limits<input_t>::max() : result.first;
+        result.second = result.second > std::numeric_limits<input_t>::max() ? std::numeric_limits<input_t>::max() : result.second;
         return result;
     }
 };

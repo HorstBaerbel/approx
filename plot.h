@@ -7,11 +7,11 @@
 #include <string>
 #include <vector>
 
-template <typename T>
-std::pair<T, T> calculateRange(const std::vector<Result<T>>& rs, std::function<T(const Result<T>&)> valueFunc)
+template <typename ResultT>
+typename ResultT::storage_range_t calculateRange(const std::vector<ResultT>& rs, std::function<typename ResultT::storage_t(const ResultT&)> valueFunc)
 {
     // get values from result
-    std::vector<T> values;
+    std::vector<typename ResultT::storage_t> values;
     for (const auto& r : rs)
     {
         values.push_back(valueFunc(r));
@@ -21,12 +21,13 @@ std::pair<T, T> calculateRange(const std::vector<Result<T>>& rs, std::function<T
     return std::make_pair(*mme.first, *mme.second);
 }
 
-template <typename T>
-std::pair<T, T> calculateMedianRange(const std::vector<Result<T>>& rs, std::function<T(const Result<T>&)> valueFunc, T sizePercent)
+template <typename ResultT>
+typename ResultT::storage_range_t calculateMedianRange(const std::vector<ResultT>& rs, std::function<typename ResultT::storage_t(const ResultT&)> valueFunc, typename ResultT::storage_t sizePercent)
 {
     // calculate median of values
-    std::vector<T> v;
-    std::transform(rs.cbegin(), rs.cend(), std::back_inserter(v), [&valueFunc](const auto& r) { return valueFunc(r); });
+    std::vector<typename ResultT::storage_t> v;
+    std::transform(rs.cbegin(), rs.cend(), std::back_inserter(v), [&valueFunc](const auto& r)
+                   { return valueFunc(r); });
     std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
     auto medianIt = v.cbegin() + v.size() / 2;
     // now get sizePercent values centered around median
@@ -36,15 +37,15 @@ std::pair<T, T> calculateMedianRange(const std::vector<Result<T>>& rs, std::func
     return std::make_pair(*leftIt, *rightIt);
 }
 
-template <typename T>
-std::pair<T, T> calculateMedianRange(const std::vector<Result<T>>& rs, std::function<const std::vector<T>&(const Result<T>&)> valuesFunc, T sizePercent)
+template <typename ResultT>
+typename ResultT::storage_range_t calculateMedianRange(const std::vector<ResultT>& rs, std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> valuesFunc, typename ResultT::storage_t sizePercent)
 {
     // calculate min / max percentage range of all values around median
-    std::pair<T, T> rangeMinMax(std::numeric_limits<T>::max(), std::numeric_limits<T>::lowest());
+    typename ResultT::storage_range_t rangeMinMax(std::numeric_limits<typename ResultT::storage_t>::max(), std::numeric_limits<typename ResultT::storage_t>::lowest());
     for (const auto& r : rs)
     {
         // calculate median of values
-        std::vector<T> v = valuesFunc(r);
+        std::vector<typename ResultT::storage_t> v = valuesFunc(r);
         std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
         auto medianIt = v.cbegin() + v.size() / 2;
         // now get sizePercent values centered around median
@@ -57,8 +58,8 @@ std::pair<T, T> calculateMedianRange(const std::vector<Result<T>>& rs, std::func
     return rangeMinMax;
 }
 
-template <typename T>
-sciplot::Plot plotLines(const std::vector<Result<T>>& rs, std::function<const std::vector<T>&(const Result<T>&)> valuesFunc, T sizePercent, const std::string& title, const std::string& yLabel)
+template <typename ResultT>
+sciplot::Plot plotLines(const std::vector<ResultT>& rs, std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> valuesFunc, typename ResultT::storage_t sizePercent, const std::string& title, const std::string& yLabel)
 {
     auto rangePercent = calculateMedianRange(rs, valuesFunc, sizePercent);
     rangePercent.second = rangePercent.second - rangePercent.first == 0 ? rangePercent.first + 1 : rangePercent.second;
@@ -78,8 +79,8 @@ sciplot::Plot plotLines(const std::vector<Result<T>>& rs, std::function<const st
     return p;
 }
 
-template <typename T>
-sciplot::Plot plotBars(const std::vector<Result<T>>& rs, std::function<T(const Result<T>&)> valueFunc, T sizePercent, const std::string& title, const std::string& yLabel)
+template <typename ResultT>
+sciplot::Plot plotBars(const std::vector<ResultT>& rs, std::function<typename ResultT::storage_t(const ResultT&)> valueFunc, typename ResultT::storage_t sizePercent, const std::string& title, const std::string& yLabel)
 {
     auto rangePercent = calculateMedianRange(rs, valueFunc, sizePercent);
     rangePercent.second = rangePercent.second - rangePercent.first == 0 ? rangePercent.first + 1 : rangePercent.second;
@@ -95,7 +96,7 @@ sciplot::Plot plotBars(const std::vector<Result<T>>& rs, std::function<T(const R
     p.yrange(0, rangePercent.second);
     p.boxWidthRelative(0.75F);
     std::vector<std::string> x;
-    std::vector<T> y;
+    std::vector<typename ResultT::storage_t> y;
     for (decltype(rs.size()) i = 0; i < rs.size(); i++)
     {
         x.push_back(rs[i].description);
@@ -105,18 +106,19 @@ sciplot::Plot plotBars(const std::vector<Result<T>>& rs, std::function<T(const R
     return p;
 }
 
-template <typename T>
-void plot(const std::vector<Result<T>>& rs, const std::string& fileName)
+template <typename ResultT>
+void plot(const std::vector<ResultT>& rs, const std::string& fileName)
 {
     const auto& fr = rs.front();
-    std::function<const std::vector<T>&(const Result<T>&)> valueFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.values; };
-    auto p0 = plotLines(rs, valueFunc, (T)98, "Value", "f(x)");
-    std::function<const std::vector<T>&(const Result<T>&)> absFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.absoluteErrors.values; };
-    auto p1 = plotLines(rs, absFunc, (T)80, "Absolute error", "|f(x) - F(x)|");
-    std::function<const std::vector<T>&(const Result<T>&)> relFunc = [](const Result<T>& r) -> const std::vector<T>& { return r.relativeErrors.values; };
-    auto p2 = plotLines(rs, relFunc, (T)80, "Relative error", "|1 - f(x) / F(x)|");
-    std::function<T(const Result<T>&)> callNsFunc = [](const Result<T>& r) { return float(r.callNs - r.overheadNs) / (float)r.samplesInRange; };
-    auto p3 = plotBars(rs, callNsFunc, (T)70, "", "Execution time [ns / call]");
+    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> valueFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>& { return r.values; };
+    auto p0 = plotLines(rs, valueFunc, (typename ResultT::storage_t)98, "Value", "f(x)");
+    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> absFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>& { return r.absoluteErrors.values; };
+    auto p1 = plotLines(rs, absFunc, (typename ResultT::storage_t)80, "Absolute error", "|f(x) - F(x)|");
+    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> relFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>& { return r.relativeErrors.values; };
+    auto p2 = plotLines(rs, relFunc, (typename ResultT::storage_t)80, "Relative error", "|1 - f(x) / F(x)|");
+    std::function<typename ResultT::storage_t(const ResultT&)> callNsFunc = [](const ResultT& r)
+    { return float(r.callNs - r.overheadNs) / (float)r.samplesInRange; };
+    auto p3 = plotBars(rs, callNsFunc, (typename ResultT::storage_t)70, "", "Execution time [ns / call]");
     sciplot::Figure mp = {{p0, p3}, {p1, p2}};
     mp.size(1200, 800);
     mp.title("Results for " + fr.suiteName);

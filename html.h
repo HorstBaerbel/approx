@@ -51,8 +51,8 @@ static const std::string HTML5BoilerPlateEnd =
 </body>\n \
 </html>";
 
-template <typename T>
-void td(std::ostream& os, const typename Result<T>::Errors& e)
+template <typename ResultT>
+void td(std::ostream& os, const typename ResultT::Errors& e)
 {
     os.precision(3);
     os << "<td>" << e.minimum << "</td>" << std::endl;
@@ -62,20 +62,20 @@ void td(std::ostream& os, const typename Result<T>::Errors& e)
     os << "<td>" << e.variance << "</td>" << std::endl;
 }
 
-template <typename T>
-void td(std::ostream& os, const Result<T>& r)
+template <typename ResultT>
+void td(std::ostream& os, const ResultT& r)
 {
     os << "<tr>" << std::endl;
     os << "<td>" << r.description << "</td>" << std::endl;
-    td<T>(os, r.absoluteErrors);
-    td<T>(os, r.relativeErrors);
+    td<ResultT>(os, r.absoluteErrors);
+    td<ResultT>(os, r.relativeErrors);
     os << "<td>" << r.stddev << "</td>" << std::endl;
     os << "<td>" << float(r.callNs - r.overheadNs) / float(r.samplesInRange) << "</td>" << std::endl;
     os << "</tr>" << std::endl;
 }
 
-template <typename T>
-void table(std::ostream& os, const std::vector<Result<T>>& rs)
+template <typename ResultT>
+void table(std::ostream& os, const std::vector<ResultT>& rs)
 {
     os << "<div class=\"centercontainer\">" << std::endl;
     os << "<table id=\"results\">" << std::endl;
@@ -111,8 +111,8 @@ void table(std::ostream& os, const std::vector<Result<T>>& rs)
     os << "</div>" << std::endl;
 }
 
-template <typename T>
-void html(const std::vector<Result<T>>& rs, const std::string& fileName, const std::string& plotFileName)
+template <typename ResultT>
+void html(const std::vector<ResultT>& rs, const std::string& fileName, const std::string& plotFileName)
 {
     const auto& fr = rs.front();
     std::ofstream htmlFile(fileName);
