@@ -7,35 +7,35 @@
 // All functions operate on float values, but some can be used on double values too.
 
 #include "test.h"
-#include <array>
 #include <cmath>
 #include <cstdint>
+#include <tuple>
 #include <vector>
 
 // Calculate the reference value for comparison.
 // Note that we could square the approximate result to get the input number
 // and use that for precision calculation, but then RMS etc would have a
 // different meaning. Here we count on the std implementation to be very precise.
-long double atan2_reference(const std::pair<long double, long double> yx)
+long double atan2_reference(const std::tuple<long double, long double> yx)
 {
-    return atan2(yx.first, yx.second);
+    return atan2(std::get<0>(yx), std::get<1>(yx));
 }
 
 // Standard function for comparison.
-float atan2_0(const std::pair<float, float> yx)
+float atan2_0(const std::tuple<float, float> yx)
 {
-    return atan2f(yx.first, yx.second);
+    return atan2f(std::get<0>(yx), std::get<1>(yx));
 }
 
 // Diamond angle
 // See: https://www.freesteel.co.uk/wpblog/2009/06/05/encoding-2d-angles-without-trigonometry/
 // License: ???
-float atan2_1(const std::pair<float, float> yx)
+float atan2_1(const std::tuple<float, float> yx)
 {
-    return atan2f(yx.first, yx.second);
+    return atan2f(std::get<0>(yx), std::get<1>(yx));
 }
 
-class Atan2fTest : public Test<std::pair<float, float>, float, double>
+class Atan2fTest : public Test<std::tuple<float, float>, float, double>
 {
   public:
     Atan2fTest(input_generator_t inputGenerator, const input_range_t& inputRange, uint64_t samplesInRange)
@@ -56,15 +56,15 @@ class Atan2fTest : public Test<std::pair<float, float>, float, double>
   protected:
     static float dummyFunc(const input_t x)
     {
-        return x.first;
+        return std::get<0>(x);
     }
 
     static input_range_t fixupInputRange(const input_range_t& range)
     {
-        auto yA = range.first.first;
-        auto yB = range.second.first;
-        auto xA = range.first.second;
-        auto xB = range.second.second;
+        auto yA = std::get<0>(range.first);
+        auto yB = std::get<0>(range.second);
+        auto xA = std::get<1>(range.first);
+        auto xB = std::get<1>(range.second);
         return {{std::min(yA, yB), std::min(xA, xB)}, {std::max(yA, yB), std::max(xA, xB)}};
     }
 };

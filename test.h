@@ -9,6 +9,7 @@
 #include <math.h>
 #include <numeric>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
@@ -175,12 +176,26 @@ std::ostream& operator<<(std::ostream& os, const std::pair<InputT, InputT>& v)
     return os;
 }
 
+template <typename... Ts>
+std::ostream& operator<<(std::ostream& os, const std::tuple<Ts...> t)
+{
+    os << '(';
+    apply([&](auto&&... args)
+          { ((os << args << ", "), ...); },
+          t);
+    os << "\b\b";
+    os << ')';
+    return os;
+}
+
 template <typename InputT, typename StorageT>
 std::ostream& operator<<(std::ostream& os, const std::vector<Result<InputT, StorageT>>& rs)
 {
     const auto& fr = rs.front();
     os << "Testing: " << fr.suiteName << std::endl;
-    os << "Input range: (" << fr.inputRange.first << ", " << fr.inputRange.second << "), " << fr.samplesInRange << " samples in range" << std::endl;
+    os << "Input range: ";
+    os << "(" << fr.inputRange.first << ", " << fr.inputRange.second << "), ";
+    os << fr.samplesInRange << " samples in range" << std::endl;
     os << "Approximate loop and call overhead (already subtracted): " << float(fr.overheadNs) / float(fr.samplesInRange) << " ns / call" << std::endl;
     os << "Tested functions:" << std::endl
        << std::endl;

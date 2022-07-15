@@ -128,7 +128,7 @@ int main(int argc, char** argv)
     }
     /*else if (m_approxFunc == "atan2f")
     {
-        Atan2fTest atan2Test(generateRandomXY<Atan2fTest::input_t>, {{-65535, -65535}, {65535, 65535}}, 10000);
+        Atan2fTest atan2Test(generateCirclesXY<Atan2fTest::input_t>, {{-65535, -65535}, {65535, 65535}}, 10000);
         auto results = atan2Test.runTests();
         std::cout << results;
         output(results);

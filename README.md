@@ -90,9 +90,10 @@ Also a result.html or result.pdf file will be saved to the current directory if 
 
 ## Todo
 
-* Add more functions (1/x, sin / cos / tan / etc.).
+* Add more functions (1/x, sin / cos / tan / atan2 / etc.).
 * Improve error and timing statistics plots.
 
 ## Random interesting links
 
 * https://stackoverflow.com/questions/1427422/cheap-algorithm-to-find-measure-of-angle-between-vectors
+* https://github.com/chmike/fpsqrt/blob/master/fpsqrt.c

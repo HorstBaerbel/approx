@@ -90,7 +90,7 @@ sciplot::Plot plotBars(const std::vector<ResultT>& rs, std::function<typename Re
     p.xlabel("");
     p.legend().hide();
     p.xtics().rotate();
-    //p.legend().title(title);
+    // p.legend().title(title);
     p.border().lineWidth(1);
     p.ylabel(yLabel);
     p.yrange(0, rangePercent.second);
@@ -106,21 +106,35 @@ sciplot::Plot plotBars(const std::vector<ResultT>& rs, std::function<typename Re
     return p;
 }
 
-template <typename ResultT>
+template <typename ResultT, typename std::enable_if<std::is_class<typename ResultT::input_t>::value, bool>::type = true>
 void plot(const std::vector<ResultT>& rs, const std::string& fileName)
 {
-    const auto& fr = rs.front();
-    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> valueFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>& { return r.values; };
+    std::function<typename ResultT::storage_t(const ResultT&)> callNsFunc = [](const ResultT& r)
+    { return float(r.callNs - r.overheadNs) / (float)r.samplesInRange; };
+    auto p0 = plotBars(rs, callNsFunc, (typename ResultT::storage_t)70, "", "Execution time [ns / call]");
+    sciplot::Figure mp = {{p0}};
+    mp.size(1200, 800);
+    mp.title("Results for " + rs.front().suiteName);
+    mp.save(fileName);
+}
+
+template <typename ResultT, typename std::enable_if<!std::is_class<typename ResultT::input_t>::value, bool>::type = true>
+void plot(const std::vector<ResultT>& rs, const std::string& fileName)
+{
+    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> valueFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>&
+    { return r.values; };
     auto p0 = plotLines(rs, valueFunc, (typename ResultT::storage_t)98, "Value", "f(x)");
-    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> absFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>& { return r.absoluteErrors.values; };
+    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> absFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>&
+    { return r.absoluteErrors.values; };
     auto p1 = plotLines(rs, absFunc, (typename ResultT::storage_t)80, "Absolute error", "|f(x) - F(x)|");
-    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> relFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>& { return r.relativeErrors.values; };
+    std::function<const std::vector<typename ResultT::storage_t>&(const ResultT&)> relFunc = [](const ResultT& r) -> const std::vector<typename ResultT::storage_t>&
+    { return r.relativeErrors.values; };
     auto p2 = plotLines(rs, relFunc, (typename ResultT::storage_t)80, "Relative error", "|1 - f(x) / F(x)|");
     std::function<typename ResultT::storage_t(const ResultT&)> callNsFunc = [](const ResultT& r)
     { return float(r.callNs - r.overheadNs) / (float)r.samplesInRange; };
     auto p3 = plotBars(rs, callNsFunc, (typename ResultT::storage_t)70, "", "Execution time [ns / call]");
     sciplot::Figure mp = {{p0, p3}, {p1, p2}};
     mp.size(1200, 800);
-    mp.title("Results for " + fr.suiteName);
+    mp.title("Results for " + rs.front().suiteName);
     mp.save(fileName);
 }
