@@ -97,3 +97,4 @@ Also a result.html or result.pdf file will be saved to the current directory if 
 
 * https://stackoverflow.com/questions/1427422/cheap-algorithm-to-find-measure-of-angle-between-vectors
 * https://github.com/chmike/fpsqrt/blob/master/fpsqrt.c
+* https://hackaday.com/2023/02/07/count-leading-zeros-for-efficient-logarithms/
